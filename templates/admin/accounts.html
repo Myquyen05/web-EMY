@@ -1,0 +1,41 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Quản lý tài khoản{% endblock %}
+{% block page_title %}🔐 Quản lý tài khoản{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h2>Tài khoản nội bộ</h2></div>
+  <a href="{{ url_for('admin.add_account') }}" class="btn btn-primary">➕ Tạo tài khoản</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Ngày tạo</th></tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="color:#8a9ab0">{{ loop.index }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--mint));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.85rem;flex-shrink:0">
+                  {{ u.fullname[0] }}
+                </div>
+                <strong>{{ u.fullname }}</strong>
+              </div>
+            </td>
+            <td>{{ u.email }}</td>
+            <td><span class="badge badge-{{ u.role }}">{{ 'Admin' if u.role == 'admin' else 'Giáo viên' }}</span></td>
+            <td><span class="badge {{ 'badge-active' if u.is_active else 'badge-inactive' }}">{{ 'Hoạt động' if u.is_active else 'Đã khóa' }}</span></td>
+            <td><small style="color:#8a9ab0">{{ u.created_at.strftime('%d/%m/%Y') }}</small></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}Blog kiến thức — EMY{% endblock %}
+{% block head %}
+<style>
+:root{--navy:#0B1829;--blue:#1558B0;--sky:#3A9BD5;--mint:#27B394;--coral:#E05A3A;--ink:#1A2332;--muted:#5A6A7E;--off:#F7F5F2;--line:rgba(11,24,41,.1);}
+*{box-sizing:border-box;}body{background:var(--off);font-family:'DM Sans',sans-serif;margin:0;}a{text-decoration:none;color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 44px;}
+.snav{background:var(--navy);height:64px;display:flex;align-items:center;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--blue);}
+.snav .wrap{display:flex;align-items:center;justify-content:space-between;width:100%;}
+.logo{display:flex;align-items:center;gap:10px;}
+.lbox{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--sky));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:#fff;}
+.lname{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;color:#fff;}
+.nav-r{display:flex;align-items:center;gap:12px;}
+.nav-r a{color:rgba(255,255,255,.65);font-size:.84rem;font-weight:600;padding:7px 16px;border-radius:8px;transition:all .18s;}
+.nav-r a:hover{color:#fff;background:rgba(255,255,255,.1);}
+.nav-r .cta{background:var(--coral);color:#fff;box-shadow:0 3px 12px rgba(224,90,58,.4);}
+.nav-r .cta:hover{background:#c94e30;}
+.hero{background:var(--navy);padding:60px 0 48px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-150px;top:-150px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(21,88,176,.3),transparent 65%);}
+.hero-in{position:relative;z-index:1;}
+.hero h1{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;color:#fff;margin-bottom:10px;}
+.hero p{color:rgba(255,255,255,.52);font-size:.95rem;margin-bottom:28px;max-width:560px;}
+.sform{display:flex;gap:10px;max-width:520px;}
+.sform input{flex:1;padding:12px 18px;border-radius:10px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;}
+.sform input::placeholder{color:rgba(255,255,255,.38);}
+.sform input:focus{border-color:var(--sky);}
+.sform button{padding:12px 22px;border-radius:10px;background:var(--blue);color:#fff;border:none;font-weight:700;cursor:pointer;white-space:nowrap;}
+.sform button:hover{background:#1264c8;}
+.catbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:64px;z-index:90;}
+.cats{display:flex;gap:0;overflow-x:auto;}
+.cats a{padding:14px 20px;font-size:.84rem;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:all .18s;}
+.cats a:hover{color:var(--blue);}
+.cats a.on{color:var(--blue);border-bottom-color:var(--blue);}
+.main{padding:48px 0 80px;}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+/* Featured */
+.feat{grid-column:1/-1;background:#fff;border-radius:20px;overflow:hidden;display:grid;grid-template-columns:1.2fr 1fr;box-shadow:0 3px 24px rgba(11,24,41,.07);transition:all .28s;}
+.feat:hover{box-shadow:0 16px 56px rgba(11,24,41,.13);}
+.feat-img{min-height:280px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:6rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);}
+.feat-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.feat-img .pbtn{position:absolute;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;font-size:1.8rem;z-index:2;box-shadow:0 4px 24px rgba(0,0,0,.2);}
+.feat-body{padding:36px;display:flex;flex-direction:column;justify-content:center;}
+.feat-body .flb{font-size:.67rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
+.feat-body h2{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:900;line-height:1.25;margin-bottom:12px;color:var(--ink);}
+.feat-body p{font-size:.9rem;color:var(--muted);line-height:1.75;margin-bottom:20px;flex:1;}
+.feat-meta{display:flex;align-items:center;gap:14px;font-size:.78rem;color:var(--muted);}
+.feat-meta .rd{color:var(--blue);font-weight:700;margin-left:auto;}
+/* Normal card */
+.bc{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 3px 20px rgba(11,24,41,.06);transition:all .28s;display:flex;flex-direction:column;}
+.bc:hover{transform:translateY(-6px);box-shadow:0 14px 44px rgba(11,24,41,.12);}
+.bc-img{height:196px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:3.5rem;}
+.bc-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.bc-img .pbtn{position:absolute;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:1.2rem;z-index:2;}
+.bc-img .bcat{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:20px;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;background:rgba(255,255,255,.92);color:var(--blue);z-index:2;}
+.bc-body{padding:18px 20px 22px;flex:1;display:flex;flex-direction:column;}
+.bc-body h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:800;line-height:1.35;margin-bottom:8px;color:var(--ink);}
+.bc-body p{font-size:.82rem;color:var(--muted);line-height:1.68;flex:1;}
+.bc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);}
+.bc-meta{font-size:.72rem;color:var(--muted);}
+.bc-rd{font-size:.75rem;font-weight:700;color:var(--blue);}
+/* Pagination */
+.pages{display:flex;justify-content:center;gap:8px;margin-top:48px;}
+.pgbtn{padding:10px 18px;border-radius:10px;border:2px solid var(--line);font-size:.84rem;font-weight:700;color:var(--ink);}
+.pgbtn:hover{border-color:var(--blue);color:var(--blue);}
+.pgbtn.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.empty{text-align:center;padding:80px 20px;color:var(--muted);}
+.empty .ei{font-size:3.5rem;margin-bottom:14px;}
+footer{background:var(--navy);padding:26px 0;text-align:center;font-size:.78rem;color:rgba(255,255,255,.28);}
+footer a{color:rgba(255,255,255,.45);}
+@media(max-width:768px){.bgrid{grid-template-columns:1fr 1fr;}.feat{grid-template-columns:1fr;}.feat-img{min-height:200px;}}
+@media(max-width:520px){.bgrid{grid-template-columns:1fr;}.wrap{padding:0 20px;}.main{padding:28px 0 60px;}}
+</style>
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+<nav class="snav">
+  <div class="wrap">
+    <a href="{{ url_for('public.index') }}" class="logo">
+      <div class="lbox">E</div><div class="lname">EMY</div>
+    </a>
+    <div class="nav-r">
+      <a href="{{ url_for('public.index') }}">← Trang chủ</a>
+      <a href="{{ url_for('public.faq') }}">FAQ</a>
+      <a href="{{ url_for('public.register_test') }}" class="cta">Đăng ký tư vấn</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="wrap hero-in">
+    <h1>📚 Blog kiến thức</h1>
+    <p>Kiến thức về tự kỷ, can thiệp sớm và nuôi dạy trẻ đặc biệt từ đội ngũ chuyên gia EMY.</p>
+    <form method="GET" class="sform">
+      {% if category %}<input type="hidden" name="cat" value="{{ category }}">{% endif %}
+      <input type="text" name="q" value="{{ q }}" placeholder="🔍 Tìm kiếm bài viết...">
+      <button type="submit">Tìm</button>
+    </form>
+  </div>
+</div>
+
+<div class="catbar">
+  <div class="wrap">
+    <div class="cats">
+      <a href="{{ url_for('public.blog') }}" class="{{ 'on' if not category }}">🗂️ Tất cả</a>
+      <a href="{{ url_for('public.blog', cat='news') }}" class="{{ 'on' if category=='news' }}">📰 Tin tức</a>
+      <a href="{{ url_for('public.blog', cat='tips') }}" class="{{ 'on' if category=='tips' }}">💡 Kiến thức</a>
+      <a href="{{ url_for('public.blog', cat='event') }}" class="{{ 'on' if category=='event' }}">📅 Sự kiện</a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="wrap">
+    {% if q %}<p style="margin-bottom:24px;color:var(--muted);font-size:.88rem">Kết quả cho: <strong style="color:var(--ink)">"{{ q }}"</strong> — {{ posts.total }} bài</p>{% endif %}
+
+    {% if posts.items %}
+    <div class="bgrid">
+      {% for p in posts.items %}
+      {% set mt = get_media_type(p.thumbnail) %}
+      {% set bg_map = {'news':'linear-gradient(135deg,#dbeafe,#bfdbfe)','tips':'linear-gradient(135deg,#d1fae5,#a7f3d0)','event':'linear-gradient(135deg,#fef3c7,#fde68a)'} %}
+      {% set emoji_map = {'news':'📰','tips':'💡','event':'📅'} %}
+
+      {% if loop.index == 1 and not q %}
+      <a href="{{ url_for('public.blog_detail', post_id=p.id) }}" class="feat">
+        <div class="feat-img" style="background:{{ bg_map.get(p.category,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
+          {% if mt == 'image' %}<img src="{{ url_for('static', filename=p.thumbnail) }}" alt="">
+          {% elif mt == 'image_url' %}<img src="{{ p.thumbnail }}" alt="">
+          {% elif mt == 'youtube' %}
+            {% set yid = p.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in p.thumbnail else p.thumbnail.split('/')[-1] %}
+            <img src="https://img.youtube.com/vi/{{ yid }}/mqdefault.jpg" alt="">
+            <div class="pbtn">▶</div>
+          {% elif mt == 'video' %}🎬<div class="pbtn">▶</div>
+          {% else %}{{ emoji_map.get(p.category,'📰') }}{% endif %}
+        </div>
+        <div class="feat-body">
+          <div class="flb">{{ {'news':'📰 Tin tức','tips':'💡 Kiến thức','event':'📅 Sự kiện'}.get(p.category,'Bài viết') }} · Nổi bật</div>
+          <h2>{{ p.title }}</h2>
+          <p>{{ p.summary or p.content|striptags|truncate(180) }}</p>
+          <div class="feat-meta">
+            <span>📅 {{ p.created_at.strftime('%d/%m/%Y') }}</span>
+            <span>👁️ {{ p.views }}</span>
+            <span class="rd">Đọc ngay →</span>
+          </div>
+        </div>
+      </a>
+      {% else %}
+      <a href="{{ url_for('public.blog_detail', post_id=p.id) }}" class="bc">
+        <div class="bc-img" style="background:{{ bg_map.get(p.category,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
+          {% if mt == 'image' %}<img src="{{ url_for('static', filename=p.thumbnail) }}" alt="">
+          {% elif mt == 'image_url' %}<img src="{{ p.thumbnail }}" alt="">
+          {% elif mt == 'youtube' %}
+            {% set yid = p.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in p.thumbnail else p.thumbnail.split('/')[-1] %}
+            <img src="https://img.youtube.com/vi/{{ yid }}/mqdefault.jpg" alt="">
+            <div class="pbtn">▶</div>
+          {% elif mt == 'video' %}🎬<div class="pbtn">▶</div>
+          {% else %}{{ emoji_map.get(p.category,'📰') }}{% endif %}
+          <span class="bcat">{{ {'news':'Tin tức','tips':'Kiến thức','event':'Sự kiện'}.get(p.category,'Bài viết') }}</span>
+        </div>
+        <div class="bc-body">
+          <h3>{{ p.title }}</h3>
+          <p>{{ p.summary or p.content|striptags|truncate(100) }}</p>
+          <div class="bc-foot">
+            <span class="bc-meta">📅 {{ p.created_at.strftime('%d/%m/%Y') }} · 👁️ {{ p.views }}</span>
+            <span class="bc-rd">Đọc thêm →</span>
+          </div>
+        </div>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if posts.pages > 1 %}
+    <div class="pages">
+      {% if posts.has_prev %}<a href="{{ url_for('public.blog', page=posts.prev_num, cat=category, q=q) }}" class="pgbtn">← Trước</a>{% endif %}
+      {% for n in posts.iter_pages(left_edge=1,right_edge=1,left_current=2,right_current=2) %}
+        {% if n %}<a href="{{ url_for('public.blog', page=n, cat=category, q=q) }}" class="pgbtn {{ 'on' if n==posts.page }}">{{ n }}</a>
+        {% else %}<span class="pgbtn" style="cursor:default">…</span>{% endif %}
+      {% endfor %}
+      {% if posts.has_next %}<a href="{{ url_for('public.blog', page=posts.next_num, cat=category, q=q) }}" class="pgbtn">Tiếp →</a>{% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty"><div class="ei">📭</div><p>{% if q %}Không tìm thấy bài viết cho "{{ q }}".{% else %}Chưa có bài viết nào.{% endif %}</p></div>
+    {% endif %}
+  </div>
+</div>
+
+<footer>© 2026 EMY Center · <a href="{{ url_for('public.index') }}">Về trang chủ</a></footer>
+{% endblock %}

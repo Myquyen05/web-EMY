@@ -1,0 +1,114 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Tiến trình - {{ student.fullname }}{% endblock %}
+{% block page_title %}📈 Tiến trình: {{ student.fullname }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>{{ student.fullname }}</h2>
+    <div class="breadcrumb">{{ student.diagnosis or 'Chưa có chẩn đoán' }}</div>
+  </div>
+  <a href="{{ url_for('admin.progress') }}" class="btn btn-secondary">← Quay lại</a>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1.5fr;gap:20px;align-items:start">
+
+  <!-- FORM THÊM TIẾN TRÌNH -->
+  <div class="card">
+    <div class="card-header"><h3>➕ Ghi nhận buổi học</h3></div>
+    <div class="card-body" style="padding:24px">
+      <form method="POST" action="{{ url_for('admin.add_progress', student_id=student.id) }}">
+        <div class="form-group">
+          <label>Ngày học *</label>
+          <input class="form-control" type="date" name="date"
+                 value="{{ today }}" required>
+        </div>
+        <div class="form-group">
+          <label>Loại buổi học</label>
+          <select class="form-control" name="session_type">
+            <option>Can thiệp ABA</option>
+            <option>Trị liệu ngôn ngữ</option>
+            <option>Trị liệu vận động</option>
+            <option>Âm nhạc trị liệu</option>
+            <option>Kỹ năng xã hội</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mục tiêu buổi học</label>
+          <textarea class="form-control" name="goals" rows="3" placeholder="Mục tiêu đặt ra..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Kết quả đạt được</label>
+          <textarea class="form-control" name="achievements" rows="3" placeholder="Những gì bé đạt được..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Đánh giá buổi học</label>
+          <select class="form-control" name="rating">
+            <option value="5">⭐⭐⭐⭐⭐ Rất tốt</option>
+            <option value="4">⭐⭐⭐⭐ Tốt</option>
+            <option value="3" selected>⭐⭐⭐ Bình thường</option>
+            <option value="2">⭐⭐ Cần cải thiện</option>
+            <option value="1">⭐ Khó khăn</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bước tiếp theo</label>
+          <textarea class="form-control" name="next_steps" rows="2" placeholder="Kế hoạch buổi tới..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">✅ Lưu tiến trình</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LỊCH SỬ TIẾN TRÌNH -->
+  <div class="card">
+    <div class="card-header">
+      <h3>📋 Lịch sử {{ logs|length }} buổi học</h3>
+    </div>
+    <div class="card-body">
+      {% if logs %}
+        {% for log in logs %}
+        <div style="padding:18px 20px;border-bottom:1px solid #f0f4f8">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div>
+              <strong style="font-size:.9rem">{{ log.date.strftime('%d/%m/%Y') }}</strong>
+              <span class="badge" style="background:#f0f4f8;color:#4a5e72;margin-left:8px">{{ log.session_type }}</span>
+            </div>
+            <div style="color:var(--sun);font-size:1rem">
+              {{ '⭐' * log.rating if log.rating else '' }}
+            </div>
+          </div>
+          {% if log.goals %}
+          <div style="font-size:.82rem;color:#637282;margin-bottom:4px">
+            <strong>Mục tiêu:</strong> {{ log.goals }}
+          </div>
+          {% endif %}
+          {% if log.achievements %}
+          <div style="font-size:.82rem;color:#065f46;margin-bottom:4px">
+            <strong>✅ Đạt được:</strong> {{ log.achievements }}
+          </div>
+          {% endif %}
+          {% if log.next_steps %}
+          <div style="font-size:.82rem;color:#1e40af">
+            <strong>→ Tiếp theo:</strong> {{ log.next_steps }}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="empty-state"><div class="empty-icon">📝</div><p>Chưa có bản ghi nào.</p></div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Set ngày hôm nay mặc định
+  document.querySelector('input[name="date"]').value =
+    new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Tiến trình học sinh{% endblock %}
+{% block page_title %}📈 Tiến trình học sinh{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Chọn học sinh để xem tiến trình</h2>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if students %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Học sinh</th><th>Chẩn đoán</th><th>Giáo viên</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td><strong>{{ s.fullname }}</strong></td>
+            <td>{{ s.diagnosis or '—' }}</td>
+            <td>{{ s.teacher.fullname if s.teacher else '—' }}</td>
+            <td>
+              <a href="{{ url_for('admin.student_progress', student_id=s.id) }}"
+                 class="btn btn-primary btn-sm">📈 Xem tiến trình</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">👶</div><p>Chưa có học sinh nào.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Tạo tài khoản{% endblock %}
+{% block page_title %}👤 Tạo tài khoản mới{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Tạo tài khoản Admin / Giáo viên</h2>
+  <a href="{{ url_for('admin.accounts') }}" class="btn btn-secondary">← Quay lại</a>
+</div>
+
+<div class="card" style="max-width:500px">
+  <div class="card-body" style="padding:28px">
+    <form method="POST">
+      <div class="form-group">
+        <label>Họ và tên *</label>
+        <input class="form-control" type="text" name="fullname" required placeholder="Nguyễn Thị A">
+      </div>
+      <div class="form-group">
+        <label>Email đăng nhập *</label>
+        <input class="form-control" type="email" name="email" required placeholder="email@anhsao.vn">
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu *</label>
+        <input class="form-control" type="password" name="password" required placeholder="Tối thiểu 6 ký tự">
+      </div>
+      <div class="form-group">
+        <label>Vai trò</label>
+        <select class="form-control" name="role">
+          <option value="teacher">👩‍🏫 Giáo viên</option>
+          <option value="admin">🔐 Admin</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button type="submit" class="btn btn-primary">✅ Tạo tài khoản</button>
+        <a href="{{ url_for('admin.accounts') }}" class="btn btn-secondary">Hủy</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

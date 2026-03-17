@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập{% endblock %}
+
+{% block head %}
+<style>
+body { background:linear-gradient(135deg, #1A2E4A 0%, #2d4a6e 50%, #1a3a5c 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+
+.login-wrap {
+  width:100%; max-width:420px; padding:20px;
+}
+.login-card {
+  background:#fff; border-radius:28px;
+  padding:44px 40px;
+  box-shadow:0 24px 80px rgba(0,0,0,.3);
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn {
+  from { transform:scale(.9) translateY(20px); opacity:0; }
+  to   { transform:scale(1)  translateY(0);    opacity:1; }
+}
+.login-logo {
+  text-align:center; margin-bottom:28px;
+}
+.login-logo .star { font-size:3rem; animation:spin 6s linear infinite; display:block; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.login-logo h1 {
+  font-family:'Baloo 2',cursive; font-size:1.8rem; font-weight:800;
+  color:var(--deep); margin-top:8px;
+}
+.login-logo p { font-size:.82rem; color:#8a9ab0; margin-top:4px; }
+
+.form-group { margin-bottom:18px; }
+.form-group label {
+  display:block; font-weight:700; font-size:.8rem;
+  color:#4a5e72; margin-bottom:7px;
+}
+.form-control {
+  width:100%; padding:12px 16px; border-radius:12px;
+  border:2px solid #e8eef4; font-family:'Nunito',sans-serif;
+  font-size:.92rem; color:var(--deep); background:#fafcff;
+  transition:border-color .2s; outline:none;
+}
+.form-control:focus { border-color:var(--sky); background:#fff; }
+
+.remember-row {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:22px; font-size:.83rem;
+}
+.remember-row label { display:flex; align-items:center; gap:7px; cursor:pointer; color:#637282; font-weight:600; }
+
+.btn-login {
+  width:100%; padding:14px; border-radius:14px;
+  background:linear-gradient(135deg, var(--sky), #4e9de0);
+  color:#fff; border:none; font-family:'Baloo 2',cursive;
+  font-size:1.05rem; font-weight:700; cursor:pointer;
+  box-shadow:0 6px 20px rgba(109,184,242,.4);
+  transition:all .25s;
+}
+.btn-login:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(109,184,242,.45); }
+
+.login-hint {
+  margin-top:22px; background:#f8fafc; border-radius:12px;
+  padding:14px 16px; font-size:.78rem; color:#637282; line-height:1.7;
+}
+.login-hint strong { color:var(--deep); }
+.back-home {
+  text-align:center; margin-top:18px;
+  font-size:.82rem; color:rgba(255,255,255,.6);
+}
+.back-home a { color:rgba(255,255,255,.9); font-weight:700; text-decoration:none; }
+.back-home a:hover { color:#fff; }
+</style>
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="star">⭐</span>
+      <h1>Ánh Sao</h1>
+      <p>Cổng quản lý nội bộ</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <div class="form-group">
+        <label>📧 Email</label>
+        <input class="form-control" type="email" name="email"
+               placeholder="email@anhsao.vn" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>🔒 Mật khẩu</label>
+        <input class="form-control" type="password" name="password"
+               placeholder="••••••••" required>
+      </div>
+      <div class="remember-row">
+        <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
+      </div>
+      <button type="submit" class="btn-login">🚀 Đăng nhập</button>
+    </form>
+
+    <div class="login-hint">
+      <strong>Tài khoản mặc định:</strong><br>
+      👤 Admin: <strong>admin@anhsao.vn</strong> / <strong>Admin@123</strong><br>
+      👩‍🏫 GV: <strong>giaovien@anhsao.vn</strong> / <strong>Teacher@123</strong>
+    </div>
+  </div>
+
+  <div class="back-home">
+    <a href="{{ url_for('public.index') }}">← Về trang chủ</a>
+  </div>
+</div>
+{% endblock %}

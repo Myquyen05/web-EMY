@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ service.name }} — EMY Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#1558B0; --sky:#3A9BD5; --navy:#0B1829;
+  --mint:#27B394; --coral:#E05A3A;
+  --white:#fff; --off:#F4F7FB; --ink:#1A2332;
+  --muted:#637282; --border:#DDE3EC;
+  --c: {{ service.color or '#1558B0' }};
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Be Vietnam Pro',sans-serif;background:#fff;color:var(--ink);line-height:1.65;}
+a{text-decoration:none;color:inherit;}
+.container{max-width:1160px;margin:0 auto;padding:0 40px;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--blue);padding:7px 0;font-size:.77rem;color:rgba(255,255,255,.85);}
+.topbar-inner{display:flex;justify-content:flex-end;gap:24px;}
+.topbar a{color:rgba(255,255,255,.85);}
+.topbar a:hover{color:#fff;}
+
+/* ── NAV ── */
+nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(11,24,41,.05);}
+.nav-in{height:68px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:11px;}
+.lbox{width:42px;height:42px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--sky));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#fff;}
+.lname{font-size:1.3rem;font-weight:800;color:var(--blue);letter-spacing:-.3px;}
+.lsub{font-size:.6rem;color:var(--muted);font-weight:500;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-links a{padding:7px 13px;border-radius:6px;font-size:.84rem;font-weight:600;color:var(--ink);transition:all .18s;}
+.nav-links a:hover{color:var(--blue);background:rgba(21,88,176,.06);}
+.nav-links a.on{color:var(--blue);}
+.nav-cta{padding:9px 20px;border-radius:6px;background:var(--blue);color:#fff !important;font-size:.84rem;font-weight:700;box-shadow:0 3px 12px rgba(21,88,176,.28);transition:all .2s;}
+.nav-cta:hover{background:#1264c8;transform:translateY(-1px);}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{background:var(--off);border-bottom:1px solid var(--border);padding:12px 0;}
+.bc-inner{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);}
+.bc-inner a{color:var(--blue);}
+.bc-inner a:hover{text-decoration:underline;}
+.bc-sep{color:var(--border);}
+
+/* ── HERO ── */
+.svc-hero{
+  background:linear-gradient(135deg, color-mix(in srgb, var(--c) 8%, #fff), color-mix(in srgb, var(--c) 4%, var(--off)));
+  border-bottom:1px solid var(--border);
+  padding:56px 0 48px;
+}
+.svc-hero-grid{display:grid;grid-template-columns:1fr 420px;gap:56px;align-items:center;}
+.svc-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:color-mix(in srgb, var(--c) 12%, transparent);
+  border:1px solid color-mix(in srgb, var(--c) 30%, transparent);
+  padding:5px 14px;border-radius:4px;
+  font-size:.7rem;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--c);margin-bottom:18px;
+}
+.svc-hero h1{font-size:clamp(1.9rem,3.5vw,2.7rem);font-weight:800;line-height:1.2;color:var(--ink);margin-bottom:16px;letter-spacing:-.3px;}
+.svc-hero h1 .icon{margin-right:8px;}
+.svc-intro{font-size:.97rem;line-height:1.8;color:var(--muted);margin-bottom:28px;}
+.svc-meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:28px;}
+.svc-meta-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:10px 14px;}
+.svc-meta-item .mi-icon{font-size:1rem;}
+.svc-meta-item h5{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:2px;}
+.svc-meta-item p{font-size:.82rem;font-weight:600;color:var(--ink);}
+.svc-hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-p{padding:11px 24px;border-radius:6px;background:var(--c);color:#fff;font-size:.87rem;font-weight:700;box-shadow:0 4px 14px color-mix(in srgb,var(--c) 35%,transparent);transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-p:hover{opacity:.9;transform:translateY(-1px);}
+.btn-o{padding:10px 22px;border-radius:6px;border:2px solid var(--c);color:var(--c);font-size:.87rem;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-o:hover{background:var(--c);color:#fff;}
+
+/* VIDEO CARD */
+.video-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 32px rgba(11,24,41,.1);border:1px solid var(--border);}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:var(--navy);}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.video-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.video-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.video-wrap .no-media{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;font-size:3.5rem;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 20%,#fff),color-mix(in srgb,var(--c) 10%,var(--off)));}
+.video-card-footer{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;}
+.video-card-footer p{font-size:.8rem;color:var(--muted);}
+.video-card-footer a{font-size:.78rem;font-weight:700;color:var(--blue);}
+
+/* ── LAYOUT ── */
+.main-wrap{padding:60px 0 80px;}
+.content-grid{display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:start;}
+
+/* ── ARTICLE CONTENT ── */
+.article-card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;}
+.article-card h2{font-size:1.3rem;font-weight:800;padding:28px 32px 0;margin-bottom:14px;color:var(--ink);}
+.ac-inner{padding:0 32px 32px;}
+.ac-inner h2{font-size:1.2rem;font-weight:800;margin:28px 0 10px;color:var(--ink);}
+.ac-inner h3{font-size:1rem;font-weight:700;margin:20px 0 8px;color:var(--ink);}
+.ac-inner p{font-size:.9rem;line-height:1.8;color:#374151;margin-bottom:14px;}
+.ac-inner ul,.ac-inner ol{padding-left:22px;margin-bottom:14px;}
+.ac-inner li{font-size:.9rem;line-height:1.75;color:#374151;margin-bottom:6px;}
+.ac-inner strong{font-weight:700;color:var(--ink);}
+.ac-inner blockquote{border-left:3px solid var(--c);padding:12px 18px;background:color-mix(in srgb,var(--c) 5%,transparent);border-radius:0 8px 8px 0;margin:16px 0;font-style:italic;color:var(--muted);}
+
+/* BENEFITS */
+.benefits-card{background:#fff;border-radius:10px;border:1px solid var(--border);padding:28px 30px;margin-top:20px;}
+.benefits-card h3{font-size:1rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.benefit-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--off);border-radius:8px;border:1px solid var(--border);}
+.benefit-check{width:22px;height:22px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff;flex-shrink:0;margin-top:1px;}
+.benefit-item p{font-size:.82rem;font-weight:600;color:var(--ink);line-height:1.4;}
+
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:18px;position:sticky;top:82px;}
+.sbox{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;}
+.sbox-head{padding:16px 20px;border-bottom:1px solid var(--border);font-size:.85rem;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.sbox-body{padding:18px 20px;}
+
+/* CTA BOX */
+.cta-box{background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 70%,var(--navy)));border-radius:10px;padding:24px 22px;text-align:center;}
+.cta-box h4{font-size:1rem;font-weight:800;color:#fff;margin-bottom:8px;}
+.cta-box p{font-size:.82rem;color:rgba(255,255,255,.7);line-height:1.65;margin-bottom:18px;}
+.cta-box a{display:block;padding:10px 18px;border-radius:6px;font-size:.84rem;font-weight:700;margin-bottom:8px;transition:all .2s;}
+.cta-box a:last-child{margin-bottom:0;}
+.ctaw{background:#fff;color:var(--navy);}
+.ctaw:hover{background:#f0f4f8;}
+.ctag{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);}
+.ctag:hover{background:rgba(255,255,255,.25);}
+
+/* OTHER SERVICES */
+.osvc-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.osvc-item:last-child{border-bottom:none;padding-bottom:0;}
+.osvc-icon{width:36px;height:36px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.osvc-body h5{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.osvc-body p{font-size:.72rem;color:var(--muted);}
+.osvc-arrow{margin-left:auto;color:var(--muted);font-size:.8rem;transition:all .2s;}
+.osvc-item:hover .osvc-arrow{color:var(--blue);transform:translateX(3px);}
+.osvc-item:hover .osvc-body h5{color:var(--blue);}
+
+/* CONTACT INFO */
+.ci-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.ci-row:last-child{margin-bottom:0;}
+.ci-icon{width:32px;height:32px;border-radius:6px;background:var(--off);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.ci-row h5{font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:2px;}
+.ci-row p{font-size:.8rem;color:var(--ink);font-weight:500;}
+
+/* RELATED POSTS */
+.rpost{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.rpost:last-child{border-bottom:none;padding-bottom:0;}
+.rpost-img{width:60px;height:48px;border-radius:6px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--off);}
+.rpost-img img{width:100%;height:100%;object-fit:cover;}
+.rpost h5{font-size:.8rem;font-weight:700;line-height:1.35;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:3px;}
+.rpost p{font-size:.7rem;color:var(--muted);}
+
+/* ── FOOTER ── */
+footer{background:var(--navy);padding:40px 0 20px;}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:rgba(255,255,255,.3);padding-top:16px;border-top:1px solid rgba(255,255,255,.08);}
+.foot-links{display:flex;gap:20px;}
+.foot-links a{font-size:.78rem;color:rgba(255,255,255,.4);transition:color .2s;}
+.foot-links a:hover{color:#fff;}
+
+@media(max-width:900px){.svc-hero-grid,.content-grid{grid-template-columns:1fr;}.sidebar{position:static;}.video-card{max-width:500px;}}
+@media(max-width:560px){.container{padding:0 20px;}.benefits-grid{grid-template-columns:1fr;}.svc-meta-row{gap:10px;}.ac-inner{padding:0 20px 24px;}.article-card h2{padding:22px 20px 0;}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-inner">
+      <span>✉️ <a href="mailto:info@emycenter.edu.vn">info@emycenter.edu.vn</a></span>
+      <span>📞 <a href="tel:0909888999">0909 888 999</a></span>
+      <span>⏰ T2–T7: 7:30–18:00</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-in">
+      <a href="{{ url_for('public.index') }}" class="logo">
+        <div class="lbox">E</div>
+        <div><div class="lname">EMY</div><div class="lsub">Can thiệp Tâm lý Giáo dục</div></div>
+      </a>
+      <div class="nav-links">
+        <a href="{{ url_for('public.index') }}#services" class="on">Dịch vụ</a>
+        <a href="{{ url_for('public.index') }}#approach">Phương pháp</a>
+        <a href="{{ url_for('public.index') }}#team">Đội ngũ</a>
+        <a href="{{ url_for('public.events') }}">Sự kiện</a>
+        <a href="{{ url_for('public.blog') }}">Blog</a>
+        <a href="{{ url_for('public.index') }}#contact">Liên hệ</a>
+      </div>
+      <a href="{{ url_for('public.register_test') }}" class="nav-cta">Đăng ký tư vấn</a>
+    </div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <div class="bc-inner">
+      <a href="{{ url_for('public.index') }}">Trang chủ</a>
+      <span class="bc-sep">›</span>
+      <a href="{{ url_for('public.index') }}#services">Dịch vụ</a>
+      <span class="bc-sep">›</span>
+      <span>{{ service.name }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="svc-hero">
+  <div class="container">
+    <div class="svc-hero-grid">
+      <!-- Left: info -->
+      <div>
+        <div class="svc-badge">{{ service.icon }} Dịch vụ EMY</div>
+        <h1><span class="icon">{{ service.icon }}</span>{{ service.name }}</h1>
+        <p class="svc-intro">{{ service.intro or service.short_desc }}</p>
+
+        <!-- Meta: age + duration -->
+        {% if service.target_age or service.duration %}
+        <div class="svc-meta-row">
+          {% if service.target_age %}
+          <div class="svc-meta-item">
+            <span class="mi-icon">👶</span>
+            <div><h5>Độ tuổi</h5><p>{{ service.target_age }}</p></div>
+          </div>
+          {% endif %}
+          {% if service.duration %}
+          <div class="svc-meta-item">
+            <span class="mi-icon">⏱️</span>
+            <div><h5>Thời lượng</h5><p>{{ service.duration }}</p></div>
+          </div>
+          {% endif %}
+          <div class="svc-meta-item">
+            <span class="mi-icon">📍</span>
+            <div><h5>Địa điểm</h5><p>Tại EMY & tại nhà</p></div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="svc-hero-btns">
+          <a href="{{ url_for('public.register_test') }}" class="btn-p">📋 Đăng ký tư vấn miễn phí</a>
+          <a href="tel:0909888999" class="btn-o">📞 Gọi ngay</a>
+        </div>
+      </div>
+
+      <!-- Right: Video -->
+      <div class="video-card">
+        <div class="video-wrap">
+          {% if yt_id %}
+            <iframe src="https://www.youtube.com/embed/{{ yt_id }}?rel=0"
+                    title="{{ service.name }}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+          {% elif service.thumbnail %}
+            {% set mt = get_media_type(service.thumbnail) %}
+            {% if mt == 'video' %}
+              <video controls preload="metadata">
+                <source src="{{ url_for('static', filename=service.thumbnail) }}">
+              </video>
+            {% else %}
+              <img src="{{ url_for('static', filename=service.thumbnail) if service.thumbnail.startswith('uploads/') else service.thumbnail }}" alt="{{ service.name }}">
+            {% endif %}
+          {% else %}
+            <div class="no-media">
+              <span>{{ service.icon }}</span>
+              <p style="font-size:.85rem;color:var(--muted);font-family:'Be Vietnam Pro',sans-serif">{{ service.name }}</p>
+            </div>
+          {% endif %}
+        </div>
+        <div class="video-card-footer">
+          <p>📹 Video giới thiệu phương pháp</p>
+          {% if yt_id %}
+          <a href="https://www.youtube.com/watch?v={{ yt_id }}" target="_blank">Xem trên YouTube →</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div class="main-wrap">
+  <div class="container">
+    <div class="content-grid">
+
+      <!-- LEFT: Article + Benefits -->
+      <div>
+        <!-- Nội dung chi tiết -->
+        <div class="article-card">
+          <h2>📖 Tìm hiểu về {{ service.name }}</h2>
+          <div class="ac-inner">
+            {{ service.content|safe if service.content else '<p>Nội dung đang được cập nhật...</p>' }}
+          </div>
+        </div>
+
+        <!-- Lợi ích -->
+        {% if benefits %}
+        <div class="benefits-card">
+          <h3>✅ Lợi ích của chương trình</h3>
+          <div class="benefits-grid">
+            {% for b in benefits %}
+            <div class="benefit-item">
+              <div class="benefit-check">✓</div>
+              <p>{{ b }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- CTA bottom -->
+        <div style="background:linear-gradient(135deg,var(--off),#fff);border:1px solid var(--border);border-radius:10px;padding:28px 30px;margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+          <div>
+            <h4 style="font-size:1rem;font-weight:800;margin-bottom:6px;">🌟 Sẵn sàng bắt đầu?</h4>
+            <p style="font-size:.85rem;color:var(--muted);">Đội ngũ EMY sẽ liên hệ trong vòng 24 giờ để tư vấn miễn phí.</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="{{ url_for('public.register_test') }}" class="btn-p" style="font-size:.85rem;padding:10px 22px;">📋 Đăng ký ngay</a>
+            <a href="{{ url_for('public.consultation') }}" class="btn-o" style="font-size:.85rem;padding:9px 20px;">Tư vấn thêm</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="sidebar">
+
+        <!-- CTA BOX -->
+        <div class="cta-box">
+          <h4>Tư vấn miễn phí</h4>
+          <p>Liên hệ ngay để được đánh giá và tư vấn chương trình phù hợp cho bé.</p>
+          <a href="{{ url_for('public.register_test') }}" class="ctaw">📋 Đăng ký đánh giá miễn phí</a>
+          <a href="{{ url_for('public.consultation') }}" class="ctag">📞 Gọi tư vấn trực tiếp</a>
+        </div>
+
+        <!-- CÁC DỊCH VỤ KHÁC -->
+        {% if other_services %}
+        <div class="sbox">
+          <div class="sbox-head">🗂️ Dịch vụ khác của EMY</div>
+          <div class="sbox-body">
+            {% for s in other_services %}
+            <a href="{{ url_for('public.service_detail', slug=s.slug) }}" class="osvc-item" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);text-decoration:none;">
+              <div class="osvc-icon" style="background:color-mix(in srgb,{{ s.color or '#1558B0' }} 10%,transparent)">{{ s.icon }}</div>
+              <div class="osvc-body">
+                <h5>{{ s.name }}</h5>
+                <p>{{ s.target_age or 'Mọi lứa tuổi' }}</p>
+              </div>
+              <span class="osvc-arrow">→</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- BÀI VIẾT LIÊN QUAN -->
+        {% if related_posts %}
+        <div class="sbox">
+          <div class="sbox-head">📰 Bài viết liên quan</div>
+          <div class="sbox-body">
+            {% for p in related_posts %}
+            <a href="{{ url_for('public.blog_detail', post_id=p.id) }}" class="rpost" style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);text-decoration:none;">
+              <div class="rpost-img">
+                {% if p.thumbnail %}
+                  <img src="{{ url_for('static', filename=p.thumbnail) if p.thumbnail.startswith('uploads/') else p.thumbnail }}" alt="">
+                {% else %}📰{% endif %}
+              </div>
+              <div>
+                <h5 class="rpost" style="font-size:.8rem;font-weight:700;line-height:1.35;color:var(--ink);margin-bottom:3px;">{{ p.title }}</h5>
+                <p style="font-size:.7rem;color:var(--muted);">{{ p.created_at.strftime('%d/%m/%Y') }}</p>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- LIÊN HỆ -->
+        <div class="sbox">
+          <div class="sbox-head">📞 Liên hệ EMY</div>
+          <div class="sbox-body">
+            <div class="ci-row"><div class="ci-icon">📍</div><div><h5>Địa chỉ</h5><p>123 Nguyễn Đình Chiểu, Q.3, TP.HCM</p></div></div>
+            <div class="ci-row"><div class="ci-icon">📞</div><div><h5>Hotline</h5><p>0909 888 999</p></div></div>
+            <div class="ci-row"><div class="ci-icon">✉️</div><div><h5>Email</h5><p>info@emycenter.edu.vn</p></div></div>
+            <div class="ci-row"><div class="ci-icon">⏰</div><div><h5>Giờ làm việc</h5><p>T2–T7: 7:30–18:00</p></div></div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-bottom">
+      <span>© 2026 EMY Center. All rights reserved.</span>
+      <div class="foot-links">
+        <a href="{{ url_for('public.index') }}">Trang chủ</a>
+        <a href="{{ url_for('public.index') }}#services">Dịch vụ</a>
+        <a href="{{ url_for('public.blog') }}">Blog</a>
+        <a href="{{ url_for('public.register_test') }}">Đăng ký tư vấn</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

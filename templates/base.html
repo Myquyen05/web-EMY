@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Ánh Sao{% endblock %} — Trung tâm Giáo dục Trẻ Đặc Biệt</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#6DB8F2; --mint:#4ECBA3; --sun:#FFD166;
+  --coral:#FF7F7F; --lav:#B89EE8; --cream:#FFF9F0;
+  --deep:#1A2E4A; --soft:#EAF4FF; --white:#ffffff;
+  --sidebar-w: 240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:#f4f7fb;color:var(--deep);}
+
+/* ── FLASH MESSAGES ── */
+.flash-wrap{position:fixed;top:80px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.flash{padding:12px 20px;border-radius:12px;font-weight:700;font-size:.88rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);animation:slideIn .3s ease;}
+.flash.success{background:#d1fae5;color:#065f46;border-left:4px solid var(--mint);}
+.flash.danger {background:#fee2e2;color:#991b1b;border-left:4px solid var(--coral);}
+.flash.info   {background:#dbeafe;color:#1e40af;border-left:4px solid var(--sky);}
+.flash.warning{background:#fef3c7;color:#92400e;border-left:4px solid var(--sun);}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- FLASH MESSAGES -->
+<div class="flash-wrap">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+</div>
+
+{% block body %}{% endblock %}
+
+<script>
+  // Tự ẩn flash sau 4s
+  setTimeout(()=>{
+    document.querySelectorAll('.flash').forEach(f=>{
+      f.style.transition='opacity .4s';f.style.opacity='0';
+      setTimeout(()=>f.remove(),400);
+    });
+  },4000);
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

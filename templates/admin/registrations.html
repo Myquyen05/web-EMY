@@ -1,0 +1,80 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Danh sách đăng ký test{% endblock %}
+{% block page_title %}📝 Đăng ký test đánh giá{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>Danh sách đăng ký</h2>
+    <div class="breadcrumb">Phụ huynh đăng ký đánh giá trẻ</div>
+  </div>
+</div>
+
+<!-- FILTER TABS -->
+<div style="display:flex;gap:8px;margin-bottom:20px">
+  <a href="{{ url_for('admin.registrations') }}"
+     class="btn {{ 'btn-primary' if not status else 'btn-secondary' }}">Tất cả</a>
+  <a href="{{ url_for('admin.registrations', status='pending') }}"
+     class="btn {{ 'btn-primary' if status == 'pending' else 'btn-secondary' }}">⏳ Chờ duyệt</a>
+  <a href="{{ url_for('admin.registrations', status='confirmed') }}"
+     class="btn {{ 'btn-primary' if status == 'confirmed' else 'btn-secondary' }}">✅ Đã xác nhận</a>
+  <a href="{{ url_for('admin.registrations', status='done') }}"
+     class="btn {{ 'btn-primary' if status == 'done' else 'btn-secondary' }}">🏁 Hoàn tất</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if regs %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Tên bé</th><th>Phụ huynh</th>
+            <th>Vấn đề lo ngại</th><th>Ngày mong muốn</th>
+            <th>Ngày đăng ký</th><th>Trạng thái</th><th>Xử lý</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in regs %}
+          <tr>
+            <td style="color:#8a9ab0">{{ loop.index }}</td>
+            <td><strong>{{ r.child_name }}</strong><br><small style="color:#8a9ab0">{{ r.child_age }}</small></td>
+            <td>
+              <strong>{{ r.parent_name }}</strong><br>
+              <small style="color:#8a9ab0">{{ r.parent_phone }}</small><br>
+              <small style="color:#8a9ab0">{{ r.parent_email or '' }}</small>
+            </td>
+            <td style="max-width:200px;font-size:.82rem">{{ r.concern or '—' }}</td>
+            <td><small>{{ r.preferred_date or '—' }}</small></td>
+            <td><small style="color:#8a9ab0">{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</small></td>
+            <td>
+              <span class="badge badge-{{ r.status }}">
+                {{ {'pending':'Chờ duyệt','confirmed':'Xác nhận','done':'Hoàn tất'}[r.status] }}
+              </span>
+            </td>
+            <td>
+              <!-- Mini form đổi trạng thái -->
+              <form method="POST" action="{{ url_for('admin.update_registration', id=r.id) }}"
+                    style="display:flex;gap:6px;align-items:center">
+                <select name="status" class="form-control" style="padding:5px 8px;font-size:.78rem;width:auto">
+                  <option value="pending"   {{ 'selected' if r.status=='pending' }}>Chờ duyệt</option>
+                  <option value="confirmed" {{ 'selected' if r.status=='confirmed' }}>Xác nhận</option>
+                  <option value="done"      {{ 'selected' if r.status=='done' }}>Hoàn tất</option>
+                </select>
+                <button type="submit" class="btn btn-success btn-sm">✓</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>Chưa có đăng ký nào.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

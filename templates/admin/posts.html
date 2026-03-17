@@ -1,0 +1,62 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Quản lý bài viết{% endblock %}
+{% block page_title %}📰 Quản lý bài viết{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>Danh sách bài viết</h2>
+    <div class="breadcrumb">Tổng: {{ posts|length }} bài</div>
+  </div>
+  <a href="{{ url_for('admin.add_post') }}" class="btn btn-primary">✍️ Viết bài mới</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if posts %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Tiêu đề</th><th>Danh mục</th><th>Tác giả</th><th>Lượt xem</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          {% for p in posts %}
+          <tr>
+            <td><strong>{{ p.title }}</strong></td>
+            <td>
+              <span class="badge" style="background:#f0f4f8;color:#4a5e72">
+                {{ {'news':'📰 Tin tức','tips':'💡 Kiến thức','event':'📅 Sự kiện'}.get(p.category, p.category) }}
+              </span>
+            </td>
+            <td>{{ p.author.fullname if p.author else '—' }}</td>
+            <td>👁 {{ p.views }}</td>
+            <td>
+              <span class="badge {{ 'badge-confirmed' if p.is_published else 'badge-inactive' }}">
+                {{ '✅ Đã đăng' if p.is_published else '📝 Nháp' }}
+              </span>
+            </td>
+            <td><small style="color:#8a9ab0">{{ p.created_at.strftime('%d/%m/%Y') }}</small></td>
+            <td>
+              <div style="display:flex;gap:6px">
+                <a href="{{ url_for('admin.edit_post', id=p.id) }}" class="btn btn-primary btn-sm">✏️</a>
+                <form method="POST" action="{{ url_for('admin.delete_post', id=p.id) }}"
+                      onsubmit="return confirm('Xóa bài viết này?')">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <p>Chưa có bài viết nào.</p>
+      <a href="{{ url_for('admin.add_post') }}" class="btn btn-primary" style="margin-top:12px">✍️ Viết bài đầu tiên</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

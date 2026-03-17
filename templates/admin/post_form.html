@@ -1,0 +1,367 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}{{ 'Sửa' if post else 'Viết' }} bài viết{% endblock %}
+{% block page_title %}{{ '✏️ Sửa bài' if post else '✍️ Viết bài mới' }}{% endblock %}
+
+{% block head %}
+<style>
+.upload-zone {
+  border:2px dashed #d0dce8; border-radius:14px;
+  padding:32px 20px; text-align:center;
+  background:#fafcff; transition:all .2s; cursor:pointer; position:relative;
+}
+.upload-zone:hover,.upload-zone.drag { border-color:var(--sky); background:#f0f7ff; }
+.upload-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+.upload-zone .uz-icon { font-size:2.5rem; margin-bottom:8px; }
+.upload-zone h4 { font-size:.9rem; font-weight:700; color:var(--deep); margin-bottom:4px; }
+.upload-zone p  { font-size:.78rem; color:#8a9ab0; }
+
+.media-preview {
+  border-radius:14px; overflow:hidden; margin-top:12px;
+  background:#f0f4f8; position:relative;
+}
+.media-preview img { width:100%; max-height:320px; object-fit:cover; display:block; }
+.media-preview video { width:100%; max-height:320px; display:block; }
+.media-preview iframe { width:100%; height:320px; border:none; display:block; }
+.preview-remove {
+  position:absolute; top:10px; right:10px;
+  background:rgba(0,0,0,.6); color:#fff; border:none;
+  width:32px; height:32px; border-radius:50%; cursor:pointer;
+  font-size:1rem; display:flex; align-items:center; justify-content:center;
+}
+.preview-remove:hover { background:rgba(220,50,50,.9); }
+
+.tab-btns { display:flex; gap:8px; margin-bottom:16px; }
+.tab-btn {
+  padding:8px 18px; border-radius:8px; font-size:.83rem; font-weight:700;
+  border:2px solid #e0e8f0; background:#fff; cursor:pointer;
+  transition:all .2s; color:#637282;
+}
+.tab-btn.active { background:var(--sky); color:#fff; border-color:var(--sky); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+.char-count { font-size:.72rem; color:#8a9ab0; text-align:right; margin-top:4px; }
+.editor-toolbar {
+  display:flex; flex-wrap:wrap; gap:4px;
+  padding:8px 12px; background:#f8fafc;
+  border:2px solid #e8eef4; border-bottom:none;
+  border-radius:10px 10px 0 0;
+}
+.editor-toolbar button {
+  padding:5px 10px; border-radius:6px; border:1px solid #e0e8f0;
+  background:#fff; cursor:pointer; font-size:.78rem; font-weight:700;
+  color:var(--deep); transition:all .15s;
+}
+.editor-toolbar button:hover { background:var(--sky); color:#fff; border-color:var(--sky); }
+.content-area {
+  border-radius:0 0 10px 10px !important;
+  border-top:none !important;
+  min-height:280px;
+  font-family:'Nunito',sans-serif;
+  font-size:.9rem; line-height:1.7;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>{{ 'Chỉnh sửa bài viết' if post else 'Đăng bài viết mới' }}</h2>
+    <div class="breadcrumb"><a href="{{ url_for('admin.posts') }}">Bài viết</a> → {{ 'Sửa' if post else 'Tạo mới' }}</div>
+  </div>
+  <a href="{{ url_for('admin.posts') }}" class="btn btn-secondary">← Quay lại</a>
+</div>
+
+<form method="POST" enctype="multipart/form-data" id="postForm">
+<div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start">
+
+  <!-- LEFT: NỘI DUNG -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+
+    <!-- Tiêu đề -->
+    <div class="card">
+      <div class="card-header"><h3>📝 Nội dung bài viết</h3></div>
+      <div class="card-body" style="padding:24px">
+        <div class="form-group">
+          <label>Tiêu đề bài viết *</label>
+          <input class="form-control" type="text" name="title" id="titleInput"
+                 value="{{ post.title if post else '' }}" required
+                 placeholder="VD: 5 dấu hiệu nhận biết tự kỷ sớm ở trẻ dưới 3 tuổi"
+                 oninput="updateCharCount(this,'titleCount',100)">
+          <div class="char-count"><span id="titleCount">{{ post.title|length if post else 0 }}</span>/100</div>
+        </div>
+        <div class="form-group">
+          <label>Tóm tắt (hiển thị ngoài trang blog)</label>
+          <textarea class="form-control" name="summary" rows="3"
+                    placeholder="Mô tả ngắn hấp dẫn để phụ huynh muốn đọc tiếp..."
+                    oninput="updateCharCount(this,'sumCount',200)">{{ post.summary if post else '' }}</textarea>
+          <div class="char-count"><span id="sumCount">{{ post.summary|length if post and post.summary else 0 }}</span>/200</div>
+        </div>
+        <div class="form-group">
+          <label>Nội dung bài viết *</label>
+          <div class="editor-toolbar">
+            <button type="button" onclick="fmt('bold')"><b>B</b></button>
+            <button type="button" onclick="fmt('italic')"><i>I</i></button>
+            <button type="button" onclick="fmt('underline')"><u>U</u></button>
+            <button type="button" onclick="fmtBlock('h2')">H2</button>
+            <button type="button" onclick="fmtBlock('h3')">H3</button>
+            <button type="button" onclick="fmtBlock('p')">¶</button>
+            <button type="button" onclick="fmt('insertUnorderedList')">• List</button>
+            <button type="button" onclick="fmt('insertOrderedList')">1. List</button>
+            <button type="button" onclick="insertLink()">🔗</button>
+            <button type="button" onclick="fmt('removeFormat')">✕ Format</button>
+          </div>
+          <div id="editor" class="form-control content-area"
+               contenteditable="true"
+               style="min-height:280px;padding:14px 16px;border-radius:0 0 10px 10px;border-top:none">{{ post.content|safe if post else '' }}</div>
+          <input type="hidden" name="content" id="contentHidden">
+        </div>
+      </div>
+    </div>
+
+    <!-- MEDIA UPLOAD -->
+    <div class="card">
+      <div class="card-header"><h3>🖼️ Ảnh / Video đại diện</h3></div>
+      <div class="card-body" style="padding:24px">
+        <div class="tab-btns">
+          <button type="button" class="tab-btn active" onclick="switchTab('upload')">📁 Upload file</button>
+          <button type="button" class="tab-btn" onclick="switchTab('url')">🔗 Dán URL / YouTube</button>
+          {% if post and post.thumbnail %}<button type="button" class="tab-btn" onclick="switchTab('current')">👁️ Media hiện tại</button>{% endif %}
+        </div>
+
+        <!-- Tab Upload -->
+        <div class="tab-panel active" id="tab-upload">
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" name="media_file" id="mediaFile" accept="image/*,video/*" onchange="previewFile(this)">
+            <div class="uz-icon">📸</div>
+            <h4>Kéo thả hoặc click để chọn file</h4>
+            <p>Hỗ trợ: JPG, PNG, GIF, WebP, MP4, WebM (tối đa 50MB)</p>
+          </div>
+          <div id="uploadPreview" style="display:none" class="media-preview">
+            <img id="previewImg" src="" alt="" style="display:none">
+            <video id="previewVid" controls style="display:none"></video>
+            <button type="button" class="preview-remove" onclick="clearUpload()" title="Xóa">✕</button>
+          </div>
+        </div>
+
+        <!-- Tab URL -->
+        <div class="tab-panel" id="tab-url">
+          <div class="form-group">
+            <label>URL ảnh hoặc link YouTube / Vimeo</label>
+            <input class="form-control" type="url" name="media_url" id="mediaUrl"
+                   placeholder="https://... hoặc https://youtube.com/watch?v=..."
+                   value="{{ post.thumbnail if post and post.thumbnail and not post.thumbnail.startswith('uploads/') else '' }}"
+                   oninput="previewUrl(this.value)">
+          </div>
+          <div id="urlPreview" style="display:none" class="media-preview">
+            <img id="urlImg" src="" alt="" style="display:none">
+            <iframe id="urlFrame" src="" style="display:none" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <!-- Tab Current Media -->
+        {% if post and post.thumbnail %}
+        <div class="tab-panel" id="tab-current">
+          <div class="media-preview">
+            {% set mtype = get_media_type(post.thumbnail) %}
+            {% if mtype == 'video' %}
+              <video controls><source src="{{ url_for('static', filename=post.thumbnail) }}"></video>
+            {% elif mtype == 'youtube' %}
+              {% set yt_id = post.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in post.thumbnail else post.thumbnail.split('/')[-1] %}
+              <iframe src="https://www.youtube.com/embed/{{ yt_id }}" allowfullscreen></iframe>
+            {% else %}
+              <img src="{{ url_for('static', filename=post.thumbnail) if post.thumbnail.startswith('uploads/') else post.thumbnail }}" alt="">
+            {% endif %}
+          </div>
+          <div style="margin-top:12px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;font-weight:700;color:#dc2626">
+              <input type="checkbox" name="remove_media" value="1"> 🗑️ Xóa media hiện tại
+            </label>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CÀI ĐẶT -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div class="card">
+      <div class="card-header"><h3>⚙️ Cài đặt bài viết</h3></div>
+      <div class="card-body" style="padding:24px">
+        <div class="form-group">
+          <label>Danh mục</label>
+          <select class="form-control" name="category">
+            <option value="news"  {{ 'selected' if post and post.category=='news' }}>📰 Tin tức</option>
+            <option value="tips"  {{ 'selected' if post and post.category=='tips' }}>💡 Kiến thức & Tips</option>
+            <option value="event" {{ 'selected' if post and post.category=='event' }}>📅 Sự kiện</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" name="is_published" style="width:18px;height:18px"
+                   {{ 'checked' if post and post.is_published }}>
+            <span>✅ Xuất bản ngay (hiển thị cho phụ huynh)</span>
+          </label>
+        </div>
+        {% if post %}
+        <div style="padding:12px;background:#f8fafc;border-radius:10px;font-size:.78rem;color:#637282">
+          <strong>Ngày tạo:</strong> {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}<br>
+          <strong>Lượt xem:</strong> 👁️ {{ post.views }}<br>
+          <strong>Tác giả:</strong> {{ post.author.fullname if post.author else '—' }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Preview card -->
+    <div class="card">
+      <div class="card-header"><h3>👁️ Xem trước thẻ blog</h3></div>
+      <div class="card-body" style="padding:16px">
+        <div style="border-radius:12px;overflow:hidden;border:1px solid #e8eef4">
+          <div id="cardPreviewImg" style="height:120px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:2.5rem">📰</div>
+          <div style="padding:12px">
+            <div style="font-size:.65rem;font-weight:800;color:var(--sky);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" id="cardPreviewCat">Tin tức</div>
+            <div style="font-size:.88rem;font-weight:700;line-height:1.3;margin-bottom:6px" id="cardPreviewTitle">Tiêu đề bài viết...</div>
+            <div style="font-size:.75rem;color:#637282;line-height:1.5" id="cardPreviewSum">Tóm tắt bài viết sẽ hiển thị ở đây...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem" onclick="submitForm()">
+      {{ '💾 Cập nhật bài viết' if post else '🚀 Đăng bài viết' }}
+    </button>
+    <a href="{{ url_for('admin.posts') }}" class="btn btn-secondary" style="width:100%;justify-content:center">Hủy</a>
+  </div>
+
+</div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Tab switch ──
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('tab-'+name);
+  if(panel) panel.classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── Preview file upload ──
+function previewFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const prev = document.getElementById('uploadPreview');
+  const img  = document.getElementById('previewImg');
+  const vid  = document.getElementById('previewVid');
+  const url  = URL.createObjectURL(file);
+  prev.style.display = 'block';
+  if(file.type.startsWith('video/')) {
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = url;
+    document.getElementById('cardPreviewImg').innerHTML = '🎬';
+    document.getElementById('cardPreviewImg').style.background = 'linear-gradient(135deg,#0B1829,#1558B0)';
+  } else {
+    vid.style.display = 'none';
+    img.style.display = 'block';
+    img.src = url;
+    document.getElementById('cardPreviewImg').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+  }
+}
+
+function clearUpload() {
+  document.getElementById('mediaFile').value = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('cardPreviewImg').innerHTML = '📰';
+  document.getElementById('cardPreviewImg').style.background = 'linear-gradient(135deg,#dbeafe,#bfdbfe)';
+}
+
+// ── Preview URL ──
+function previewUrl(val) {
+  val = val.trim();
+  if(!val) return;
+  const prev  = document.getElementById('urlPreview');
+  const img   = document.getElementById('urlImg');
+  const frame = document.getElementById('urlFrame');
+  prev.style.display = 'block';
+
+  if(val.includes('youtube.com') || val.includes('youtu.be')) {
+    let vid_id = '';
+    if(val.includes('v='))        vid_id = val.split('v=')[1].split('&')[0];
+    else if(val.includes('youtu.be')) vid_id = val.split('youtu.be/')[1];
+    img.style.display   = 'none';
+    frame.style.display = 'block';
+    frame.src = `https://www.youtube.com/embed/${vid_id}`;
+    document.getElementById('cardPreviewImg').innerHTML = `<img src="https://img.youtube.com/vi/${vid_id}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover">`;
+  } else if(val.includes('vimeo.com')) {
+    const vid_id = val.split('/').pop();
+    img.style.display   = 'none';
+    frame.style.display = 'block';
+    frame.src = `https://player.vimeo.com/video/${vid_id}`;
+  } else {
+    frame.style.display = 'none';
+    img.style.display   = 'block';
+    img.src = val;
+    document.getElementById('cardPreviewImg').innerHTML = `<img src="${val}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+  }
+}
+
+// ── Rich text editor ──
+function fmt(cmd) { document.execCommand(cmd, false, null); }
+function fmtBlock(tag) { document.execCommand('formatBlock', false, tag); }
+function insertLink() {
+  const url = prompt('Nhập URL:');
+  if(url) document.execCommand('createLink', false, url);
+}
+
+// ── Submit: copy editor → hidden input ──
+function submitForm() {
+  document.getElementById('contentHidden').value = document.getElementById('editor').innerHTML;
+}
+document.getElementById('postForm').addEventListener('submit', function() {
+  document.getElementById('contentHidden').value = document.getElementById('editor').innerHTML;
+});
+
+// ── Char count ──
+function updateCharCount(el, countId, max) {
+  document.getElementById(countId).textContent = el.value.length;
+}
+
+// ── Live preview card ──
+document.getElementById('titleInput').addEventListener('input', function() {
+  document.getElementById('cardPreviewTitle').textContent = this.value || 'Tiêu đề bài viết...';
+});
+document.querySelector('textarea[name="summary"]').addEventListener('input', function() {
+  document.getElementById('cardPreviewSum').textContent = this.value || 'Tóm tắt bài viết sẽ hiển thị ở đây...';
+});
+document.querySelector('select[name="category"]').addEventListener('change', function() {
+  const map = {news:'📰 Tin tức', tips:'💡 Kiến thức', event:'📅 Sự kiện'};
+  document.getElementById('cardPreviewCat').textContent = map[this.value] || this.value;
+});
+
+// ── Drag & drop ──
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(file) {
+    const input = document.getElementById('mediaFile');
+    const dt = new DataTransfer(); dt.items.add(file);
+    input.files = dt.files;
+    previewFile(input);
+  }
+});
+
+// Init existing preview từ URL
+window.addEventListener('DOMContentLoaded', () => {
+  const urlInput = document.getElementById('mediaUrl');
+  if(urlInput && urlInput.value) previewUrl(urlInput.value);
+});
+</script>
+{% endblock %}

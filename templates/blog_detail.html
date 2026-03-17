@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} — EMY Blog{% endblock %}
+{% block head %}
+<style>
+:root{--navy:#0B1829;--blue:#1558B0;--sky:#3A9BD5;--mint:#27B394;--coral:#E05A3A;--ink:#1A2332;--muted:#5A6A7E;--off:#F7F5F2;--line:rgba(11,24,41,.1);}
+*{box-sizing:border-box;}body{background:var(--off);font-family:'DM Sans',sans-serif;margin:0;color:var(--ink);}a{text-decoration:none;color:inherit;}
+.snav{background:var(--navy);height:64px;display:flex;align-items:center;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--blue);}
+.wrap{max-width:1180px;margin:0 auto;padding:0 44px;}
+.snav .wrap{display:flex;align-items:center;justify-content:space-between;width:100%;}
+.logo{display:flex;align-items:center;gap:10px;}
+.lbox{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--sky));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:#fff;}
+.lname{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;color:#fff;}
+.nav-r a{color:rgba(255,255,255,.65);font-size:.84rem;font-weight:600;padding:7px 14px;border-radius:8px;margin-left:4px;transition:all .18s;}
+.nav-r a:hover{color:#fff;background:rgba(255,255,255,.1);}
+.nav-r .cta{background:var(--coral);color:#fff;}
+.nav-r .cta:hover{background:#c94e30;}
+
+/* BREADCRUMB */
+.breadcrumb{background:#fff;border-bottom:1px solid var(--line);padding:12px 0;}
+.breadcrumb .wrap{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);}
+.breadcrumb a{color:var(--blue);}
+.breadcrumb span{color:var(--muted);}
+
+/* LAYOUT */
+.article-wrap{padding:48px 0 80px;}
+.article-layout{display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:start;}
+
+/* ARTICLE */
+.article{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 3px 24px rgba(11,24,41,.06);}
+.article-header{padding:36px 40px 0;}
+.art-cat{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:rgba(21,88,176,.08);color:var(--blue);font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;}
+.article-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:900;line-height:1.2;margin-bottom:18px;color:var(--ink);}
+.art-meta{display:flex;align-items:center;flex-wrap:wrap;gap:16px;padding-bottom:24px;border-bottom:1px solid var(--line);font-size:.8rem;color:var(--muted);}
+.art-author{display:flex;align-items:center;gap:8px;}
+.art-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--mint));display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;}
+
+/* MEDIA */
+.art-media{margin:28px 40px;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(11,24,41,.1);}
+.art-media img{width:100%;max-height:480px;object-fit:cover;display:block;}
+.art-media video{width:100%;max-height:480px;display:block;background:#000;}
+.art-media .yt-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
+.art-media .yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+
+/* CONTENT */
+.art-content{padding:28px 40px 40px;line-height:1.85;font-size:.97rem;color:#2a3a4a;}
+.art-content h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:800;margin:32px 0 14px;color:var(--ink);}
+.art-content h3{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:800;margin:24px 0 10px;color:var(--ink);}
+.art-content p{margin-bottom:16px;}
+.art-content ul,.art-content ol{padding-left:24px;margin-bottom:16px;}
+.art-content li{margin-bottom:8px;}
+.art-content blockquote{border-left:4px solid var(--blue);padding:16px 20px;background:rgba(21,88,176,.05);border-radius:0 12px 12px 0;margin:20px 0;font-style:italic;color:var(--muted);}
+.art-content strong{color:var(--ink);font-weight:700;}
+.art-content a{color:var(--blue);text-decoration:underline;}
+.art-content img{max-width:100%;border-radius:12px;margin:16px 0;}
+
+/* SHARE */
+.art-share{padding:20px 40px 30px;border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;}
+.art-share span{font-size:.82rem;font-weight:700;color:var(--muted);}
+.share-btn{padding:8px 18px;border-radius:8px;font-size:.8rem;font-weight:700;border:2px solid var(--line);color:var(--ink);transition:all .2s;cursor:pointer;background:#fff;}
+.share-btn:hover{border-color:var(--blue);color:var(--blue);}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:20px;}
+.sbox{background:#fff;border-radius:16px;padding:22px;box-shadow:0 3px 20px rgba(11,24,41,.06);}
+.sbox h4{font-family:'Playfair Display',serif;font-size:1rem;font-weight:800;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+.cta-box{background:linear-gradient(135deg,var(--blue),var(--navy));border-radius:16px;padding:24px;text-align:center;}
+.cta-box h4{color:#fff;font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:800;margin-bottom:8px;}
+.cta-box p{color:rgba(255,255,255,.65);font-size:.82rem;line-height:1.65;margin-bottom:16px;}
+.cta-box a{display:block;background:#fff;color:var(--navy);padding:11px 20px;border-radius:10px;font-size:.84rem;font-weight:700;margin-bottom:8px;transition:all .2s;}
+.cta-box a:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
+.cta-box a.sec{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);}
+.cta-box a.sec:hover{background:rgba(255,255,255,.25);}
+
+/* RELATED */
+.related-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+.related-item:last-child{border-bottom:none;padding-bottom:0;}
+.ri-img{width:68px;height:52px;border-radius:8px;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:1.4rem;position:relative;}
+.ri-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.ri-body h5{font-size:.82rem;font-weight:700;line-height:1.35;margin-bottom:4px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ri-body p{font-size:.72rem;color:var(--muted);}
+
+footer{background:var(--navy);padding:26px 0;text-align:center;font-size:.78rem;color:rgba(255,255,255,.28);}
+footer a{color:rgba(255,255,255,.45);}
+@media(max-width:900px){.article-layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+@media(max-width:520px){.wrap{padding:0 16px;}.article-header,.art-content,.art-media,.art-share{padding-left:20px;padding-right:20px;}.article-header{padding-top:24px;}.article-header h1{font-size:1.6rem;}}
+</style>
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+<nav class="snav">
+  <div class="wrap">
+    <a href="{{ url_for('public.index') }}" class="logo">
+      <div class="lbox">E</div><div class="lname">EMY</div>
+    </a>
+    <div class="nav-r">
+      <a href="{{ url_for('public.blog') }}">← Blog</a>
+      <a href="{{ url_for('public.register_test') }}" class="cta">Đăng ký tư vấn</a>
+    </div>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <div class="wrap">
+    <a href="{{ url_for('public.index') }}">Trang chủ</a>
+    <span>›</span>
+    <a href="{{ url_for('public.blog') }}">Blog</a>
+    <span>›</span>
+    <span>{{ post.title|truncate(50) }}</span>
+  </div>
+</div>
+
+<div class="article-wrap">
+  <div class="wrap">
+    <div class="article-layout">
+
+      <!-- ARTICLE -->
+      <article class="article">
+        <div class="article-header">
+          <div class="art-cat">{{ {'news':'📰 Tin tức','tips':'💡 Kiến thức','event':'📅 Sự kiện'}.get(post.category,'Bài viết') }}</div>
+          <h1>{{ post.title }}</h1>
+          <div class="art-meta">
+            <div class="art-author">
+              <div class="art-av">{{ post.author.fullname[0] if post.author else 'E' }}</div>
+              <span><strong>{{ post.author.fullname if post.author else 'EMY Team' }}</strong></span>
+            </div>
+            <span>📅 {{ post.created_at.strftime('%d/%m/%Y') }}</span>
+            <span>👁️ {{ post.views }} lượt xem</span>
+            {% if post.updated_at and post.updated_at != post.created_at %}
+            <span>✏️ Cập nhật {{ post.updated_at.strftime('%d/%m/%Y') }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- MEDIA -->
+        {% set mtype = get_media_type(post.thumbnail) %}
+        {% if post.thumbnail %}
+        <div class="art-media">
+          {% if mtype == 'image' %}
+            <img src="{{ url_for('static', filename=post.thumbnail) }}" alt="{{ post.title }}">
+          {% elif mtype == 'image_url' %}
+            <img src="{{ post.thumbnail }}" alt="{{ post.title }}">
+          {% elif mtype == 'video' %}
+            <video controls preload="metadata">
+              <source src="{{ url_for('static', filename=post.thumbnail) }}">
+              Trình duyệt không hỗ trợ video.
+            </video>
+          {% elif mtype == 'youtube' %}
+            {% set yid = post.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in post.thumbnail else post.thumbnail.split('/')[-1] %}
+            <div class="yt-wrap">
+              <iframe src="https://www.youtube.com/embed/{{ yid }}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- CONTENT -->
+        <div class="art-content">
+          {% if post.summary %}
+          <blockquote>{{ post.summary }}</blockquote>
+          {% endif %}
+          {{ post.content|safe }}
+        </div>
+
+        <!-- SHARE -->
+        <div class="art-share">
+          <span>Chia sẻ:</span>
+          <button class="share-btn" onclick="sharePost('facebook')">📘 Facebook</button>
+          <button class="share-btn" onclick="sharePost('zalo')">💬 Zalo</button>
+          <button class="share-btn" onclick="copyLink()">🔗 Copy link</button>
+        </div>
+      </article>
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <!-- CTA Box -->
+        <div class="cta-box">
+          <h4>🌟 Cần tư vấn?</h4>
+          <p>Đội ngũ chuyên gia EMY luôn sẵn sàng hỗ trợ bạn.</p>
+          <a href="{{ url_for('public.register_test') }}">📋 Đăng ký đánh giá miễn phí</a>
+          <a href="{{ url_for('public.consultation') }}" class="sec">📞 Đăng ký tư vấn</a>
+        </div>
+
+        <!-- Related -->
+        {% if related %}
+        <div class="sbox">
+          <h4>📌 Bài viết liên quan</h4>
+          {% for r in related %}
+          {% set rmt = get_media_type(r.thumbnail) %}
+          {% set bg_map = {'news':'linear-gradient(135deg,#dbeafe,#bfdbfe)','tips':'linear-gradient(135deg,#d1fae5,#a7f3d0)','event':'linear-gradient(135deg,#fef3c7,#fde68a)'} %}
+          <a href="{{ url_for('public.blog_detail', post_id=r.id) }}" class="related-item">
+            <div class="ri-img" style="background:{{ bg_map.get(r.category,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
+              {% if rmt == 'image' %}<img src="{{ url_for('static', filename=r.thumbnail) }}" alt="">
+              {% elif rmt == 'image_url' %}<img src="{{ r.thumbnail }}" alt="">
+              {% elif rmt == 'youtube' %}
+                {% set yid = r.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in r.thumbnail else r.thumbnail.split('/')[-1] %}
+                <img src="https://img.youtube.com/vi/{{ yid }}/mqdefault.jpg" alt="">
+              {% else %}{{ {'news':'📰','tips':'💡','event':'📅'}.get(r.category,'📰') }}{% endif %}
+            </div>
+            <div class="ri-body">
+              <h5>{{ r.title }}</h5>
+              <p>{{ r.created_at.strftime('%d/%m/%Y') }} · 👁️ {{ r.views }}</p>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Contact info -->
+        <div class="sbox">
+          <h4>📞 Liên hệ EMY</h4>
+          <div style="font-size:.82rem;color:var(--muted);line-height:2">
+            📍 2B đường 22 khu phố 4, phường Hiệp Bình, Thành Phố Hồ Chí Minh<br>
+            📞 0962525703<br>
+            ✉️ emy.center@gmail.com<br>
+            ⏰ T2–T7: 7:30–18:00
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 EMY Center · <a href="{{ url_for('public.index') }}">Trang chủ</a> · <a href="{{ url_for('public.blog') }}">Blog</a></footer>
+
+<script>
+function sharePost(platform) {
+  const url = encodeURIComponent(window.location.href);
+  const title = encodeURIComponent(document.title);
+  let link = '';
+  if(platform === 'facebook') link = `https://www.facebook.com/share/1L4m4r9ztP/?mibextid=wwXIfr${url}`;
+  else if(platform === 'zalo')    link = `https://zalo.me/share?u=${url}`;
+  if(link) window.open(link, '_blank', 'width=600,height=400');
+}
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    alert('✅ Đã copy link!');
+  });
+}
+</script>
+{% endblock %}
