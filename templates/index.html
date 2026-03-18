@@ -471,23 +471,184 @@ footer ul li a:hover { color:#fff; }
 /* ══════════════════════════
    RESPONSIVE
 ══════════════════════════ */
-@media(max-width:960px){
-  .hero-grid,.approach-grid,.events-inner{ grid-template-columns:1fr; }
-  .hero-cards { display:grid; grid-template-columns:1fr 1fr; }
-  .svc-grid,.team-grid,.test-grid,.blog-grid{ grid-template-columns:1fr 1fr; }
-  .stats-grid,.contact-grid{ grid-template-columns:1fr 1fr; }
-  .footer-grid{ grid-template-columns:1fr 1fr; }
-  .nav-menu { display:none; }
+/* ══════════════════════════
+   HAMBURGER MENU
+══════════════════════════ */
+.hamburger {
+  display:none; flex-direction:column; gap:5px;
+  cursor:pointer; padding:8px; border:none; background:transparent;
 }
-@media(max-width:580px){
-  .container{ padding:0 20px; }
-  .section{ padding:56px 0; }
-  .svc-grid,.team-grid,.test-grid,.blog-grid{ grid-template-columns:1fr; }
+.hamburger span {
+  width:24px; height:2px; background:var(--ink);
+  border-radius:2px; transition:all .3s;
+}
+.hamburger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2){ opacity:0; }
+.hamburger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+/* Mobile nav drawer */
+.mobile-nav {
+  display:none; position:fixed; inset:0; z-index:300;
+}
+.mobile-nav.open { display:block; }
+.mobile-nav-overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,.45);
+}
+.mobile-nav-drawer {
+  position:absolute; top:0; left:0; bottom:0; width:280px;
+  background:#fff; box-shadow:4px 0 24px rgba(0,0,0,.15);
+  display:flex; flex-direction:column; overflow-y:auto;
+  transform:translateX(-100%); transition:transform .3s ease;
+}
+.mobile-nav.open .mobile-nav-drawer { transform:translateX(0); }
+.mobile-nav-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; border-bottom:1px solid var(--border);
+}
+.mobile-nav-links { padding:12px 0; flex:1; }
+.mobile-nav-links a {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 22px; font-size:.92rem; font-weight:600;
+  color:var(--ink); border-bottom:1px solid var(--border);
+  transition:all .18s;
+}
+.mobile-nav-links a:hover { background:var(--off); color:var(--blue); }
+.mobile-nav-links a .micon { font-size:1rem; width:20px; }
+.mobile-nav-footer { padding:16px 20px; border-top:1px solid var(--border); }
+.mobile-nav-footer .btn-primary { width:100%; justify-content:center; margin-bottom:10px; }
+.mobile-nav-footer .login-link {
+  display:block; text-align:center; font-size:.83rem;
+  font-weight:600; color:var(--muted); padding:8px;
+}
+
+/* ══════════════════════════
+   RESPONSIVE — TABLET 960px
+══════════════════════════ */
+@media(max-width:960px){
+  /* Nav */
+  .nav-menu  { display:none; }
+  .nav-cta   { display:none; }
+  .hamburger { display:flex; }
+
+  /* Topbar */
+  .topbar-inner { justify-content:center; gap:16px; font-size:.72rem; }
+
+  /* Hero */
+  .hero-grid { grid-template-columns:1fr; gap:32px; }
+  .hero { padding:48px 0 40px; }
+  .hero h1 { font-size:2.2rem; }
+  .hero-cards { grid-template-columns:1fr 1fr; gap:12px; }
+  .hcard { padding:14px 16px; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns:repeat(4,1fr); }
+
+  /* Sections */
+  .section { padding:64px 0; }
+  .svc-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+  .approach-grid { grid-template-columns:1fr; gap:32px; }
+  .approach-img  { max-width:320px; margin:0 auto; aspect-ratio:16/9; }
+  .team-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+  .test-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+  .blog-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+
+  /* Events */
+  .events-inner { grid-template-columns:1fr; gap:28px; }
+  .events-cta-box { position:static; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns:1fr 1fr; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns:1fr 1fr; gap:28px; }
+
+  /* CTA */
+  .cta-btns { gap:10px; }
+}
+
+/* ══════════════════════════
+   RESPONSIVE — MOBILE 640px
+══════════════════════════ */
+@media(max-width:640px){
+  /* Container */
+  .container { padding:0 18px; }
+
+  /* Topbar — ẩn bớt */
+  .topbar-item:last-child { display:none; }
+
+  /* Nav */
+  .logo-sub { display:none; }
+
+  /* Hero */
+  .hero { padding:36px 0 32px; }
+  .hero h1 { font-size:1.9rem; line-height:1.2; }
+  .hero-label { font-size:.65rem; }
+  .hero-desc  { font-size:.9rem; }
+  .hero-btns  { flex-direction:column; gap:10px; }
+  .btn-primary, .btn-outline { width:100%; justify-content:center; }
+  .hero-cards { grid-template-columns:1fr 1fr; gap:10px; }
+  .hcard { padding:12px 14px; }
+  .hcard h4 { font-size:.82rem; }
+  .hcard p  { display:none; }
+  .hcard-arrow { display:none; }
+  .hero-stats { gap:16px; flex-wrap:wrap; }
+  .hstat-num  { font-size:1.3rem; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .stat-num   { font-size:2rem; }
+
+  /* Sections */
+  .section { padding:48px 0; }
+  .sec-title { font-size:1.55rem; }
+
+  /* Services */
+  .svc-grid { grid-template-columns:1fr; gap:14px; }
+  .svc-card { padding:22px 20px; }
+
+  /* Approach */
+  .step-item { padding:12px 14px; }
+
+  /* Team */
+  .team-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* Testimonials */
+  .test-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* Events */
+  .ev-item { padding:14px 16px; gap:12px; }
+  .ev-tag  { display:none; }
+
+  /* Blog */
+  .blog-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* CTA */
+  .cta-section { padding:56px 0; }
+  .cta-inner h2 { font-size:1.6rem; }
+  .cta-btns { flex-direction:column; align-items:stretch; }
+  .cta-btn-w, .cta-btn-g { justify-content:center; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns:1fr; gap:12px; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns:1fr; gap:24px; }
+  .footer-brand p { max-width:100%; }
+  .foot-bottom { flex-direction:column; gap:8px; text-align:center; }
+
+  /* Sec header events */
+  .sec-header[style*="flex"] { flex-direction:column; align-items:flex-start; gap:12px; }
+}
+
+/* ══════════════════════════
+   RESPONSIVE — SMALL 380px
+══════════════════════════ */
+@media(max-width:380px){
+  .container { padding:0 14px; }
+  .hero h1   { font-size:1.65rem; }
   .hero-cards{ grid-template-columns:1fr; }
-  .footer-grid{ grid-template-columns:1fr; }
-  .cta-btns{ flex-direction:column; align-items:center; }
-  .contact-grid{ grid-template-columns:1fr 1fr; }
-  .hero h1{ font-size:1.8rem; }
+  .hcard p   { display:none; }
+  .stats-grid{ grid-template-columns:1fr 1fr; }
 }
 </style>
 </head>
@@ -527,9 +688,41 @@ footer ul li a:hover { color:#fff; }
       </div>
 
       <a href="{{ url_for('public.register_test') }}" class="nav-cta">Đăng ký tư vấn</a>
+
+      <!-- Hamburger button (mobile) -->
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- ══ MOBILE NAV DRAWER ══ -->
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-overlay" onclick="closeMenu()"></div>
+  <div class="mobile-nav-drawer">
+    <div class="mobile-nav-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="logo-icon" style="width:36px;height:36px;font-size:1.1rem">E</div>
+        <div><div class="logo-name" style="font-size:1.2rem">EMY</div></div>
+      </div>
+      <button onclick="closeMenu()" style="border:none;background:none;font-size:1.3rem;cursor:pointer;color:var(--muted);padding:4px">✕</button>
+    </div>
+    <div class="mobile-nav-links">
+      <a href="#services" onclick="closeMenu()"><span class="micon">🧩</span> Dịch vụ</a>
+      <a href="#approach" onclick="closeMenu()"><span class="micon">🔬</span> Phương pháp</a>
+      <a href="#team"     onclick="closeMenu()"><span class="micon">👥</span> Đội ngũ</a>
+      <a href="#events"   onclick="closeMenu()"><span class="micon">📅</span> Sự kiện</a>
+      <a href="#blog"     onclick="closeMenu()"><span class="micon">📰</span> Blog</a>
+      <a href="{{ url_for('public.faq') }}"   onclick="closeMenu()"><span class="micon">❓</span> Hỏi đáp</a>
+      <a href="#contact"  onclick="closeMenu()"><span class="micon">📍</span> Liên hệ</a>
+    </div>
+    <div class="mobile-nav-footer">
+      <a href="{{ url_for('public.register_test') }}" class="btn-primary" onclick="closeMenu()" style="display:flex;justify-content:center;margin-bottom:10px">📋 Đăng ký tư vấn miễn phí</a>
+      <a href="{{ url_for('auth.login') }}" class="login-link" onclick="closeMenu()">🔐 Đăng nhập nội bộ</a>
+    </div>
+  </div>
+</div>
 
 <!-- ══ HERO ══ -->
 <section class="hero">
@@ -845,13 +1038,37 @@ footer ul li a:hover { color:#fff; }
       <a href="{{ url_for('public.blog') }}" class="btn-outline" style="font-size:.82rem;padding:9px 20px;white-space:nowrap">Xem tất cả →</a>
     </div>
     <div class="blog-grid">
+      {% set bg_map = {'news':'linear-gradient(135deg,#dbeafe,#bfdbfe)','tips':'linear-gradient(135deg,#d1fae5,#a7f3d0)','event':'linear-gradient(135deg,#fef3c7,#fde68a)'} %}
+      {% set cat_map = {'news':'Tin tức','tips':'Kiến thức','event':'Sự kiện'} %}
+      {% set emoji_map = {'news':'📰','tips':'💡','event':'📅'} %}
+
       {% if posts %}
         {% for p in posts %}
-        {% set bg_map = {'news':'linear-gradient(135deg,#dbeafe,#bfdbfe)','tips':'linear-gradient(135deg,#d1fae5,#a7f3d0)','event':'linear-gradient(135deg,#fef3c7,#fde68a)'} %}
+        {% set mt = get_media_type(p.thumbnail) if p.thumbnail else None %}
         <a href="{{ url_for('public.blog_detail', post_id=p.id) }}" class="blog-card">
           <div class="blog-img" style="background:{{ bg_map.get(p.category,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
-            {{ {'news':'📰','tips':'💡','event':'📅'}.get(p.category,'📰') }}
-            <span class="blog-cat">{{ {'news':'Tin tức','tips':'Kiến thức','event':'Sự kiện'}.get(p.category,'Bài viết') }}</span>
+
+            {# Hiển thị ảnh/video thumbnail nếu có #}
+            {% if mt == 'image' %}
+              <img src="{{ url_for('static', filename=p.thumbnail) }}" alt="{{ p.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+            {% elif mt == 'image_url' %}
+              <img src="{{ p.thumbnail }}" alt="{{ p.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+            {% elif mt == 'youtube' %}
+              {% set yid = p.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in p.thumbnail else p.thumbnail.split('/')[-1] %}
+              <img src="https://img.youtube.com/vi/{{ yid }}/mqdefault.jpg" alt="{{ p.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2">
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:1rem;">▶</div>
+              </div>
+            {% elif mt == 'video' %}
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0B1829,#1558B0)">
+                <div style="font-size:2.5rem">🎬</div>
+              </div>
+            {% else %}
+              {# Không có media → emoji mặc định #}
+              {{ emoji_map.get(p.category,'📰') }}
+            {% endif %}
+
+            <span class="blog-cat">{{ cat_map.get(p.category,'Bài viết') }}</span>
           </div>
           <div class="blog-body">
             <h4>{{ p.title }}</h4>
@@ -863,25 +1080,26 @@ footer ul li a:hover { color:#fff; }
           </div>
         </a>
         {% endfor %}
+
       {% else %}
+        {# Placeholder khi chưa có bài viết nào được đăng #}
         {% set demo = [
-          ('🧩','news','5 dấu hiệu nhận biết tự kỷ sớm ở trẻ dưới 3 tuổi','Phát hiện sớm là chìa khóa giúp trẻ có cơ hội can thiệp hiệu quả nhất...','15/03/2026'),
-          ('🗣️','tips','ABA là gì? Phương pháp can thiệp hiệu quả nhất hiện nay','Applied Behavior Analysis — phương pháp được nghiên cứu bài bản nhất...','10/03/2026'),
-          ('👨‍👩‍👧','tips','10 điều cha mẹ nên làm mỗi ngày để hỗ trợ trẻ tự kỷ','Những thói quen nhỏ mỗi ngày có thể tạo ra sự khác biệt lớn...','05/03/2026'),
+          ('📰','news','5 dấu hiệu nhận biết tự kỷ sớm ở trẻ dưới 3 tuổi','Phát hiện sớm là chìa khóa giúp trẻ có cơ hội can thiệp hiệu quả nhất...','15/03/2026'),
+          ('💡','tips','ABA là gì? Phương pháp can thiệp hiệu quả nhất hiện nay','Applied Behavior Analysis — phương pháp được nghiên cứu bài bản nhất...','10/03/2026'),
+          ('💡','tips','10 điều cha mẹ nên làm mỗi ngày để hỗ trợ trẻ tự kỷ','Những thói quen nhỏ mỗi ngày có thể tạo ra sự khác biệt lớn...','05/03/2026'),
         ] %}
-        {% set bg_d = {'news':'linear-gradient(135deg,#dbeafe,#bfdbfe)','tips':'linear-gradient(135deg,#d1fae5,#a7f3d0)'} %}
-        {% set cat_d = {'news':'Tin tức','tips':'Kiến thức'} %}
         {% for emoji,cat,title,desc,date in demo %}
-        <div class="blog-card">
-          <div class="blog-img" style="background:{{ bg_d.get(cat,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
-            {{ emoji }}<span class="blog-cat">{{ cat_d.get(cat,'Bài viết') }}</span>
+        <div class="blog-card" style="cursor:default">
+          <div class="blog-img" style="background:{{ bg_map.get(cat,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
+            {{ emoji }}
+            <span class="blog-cat">{{ cat_map.get(cat,'Bài viết') }}</span>
           </div>
           <div class="blog-body">
             <h4>{{ title }}</h4>
             <p>{{ desc }}</p>
             <div class="blog-footer">
               <span class="blog-date">📅 {{ date }}</span>
-              <span class="blog-read">Đọc thêm →</span>
+              <span class="blog-read" style="color:var(--muted)">Sắp có →</span>
             </div>
           </div>
         </div>
@@ -968,6 +1186,22 @@ footer ul li a:hover { color:#fff; }
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Hamburger menu
+function toggleMenu() {
+  const nav  = document.getElementById('mobileNav');
+  const btn  = document.getElementById('hamburger');
+  nav.classList.toggle('open');
+  btn.classList.toggle('open');
+  document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Đóng menu khi bấm phím ESC
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeMenu(); });
+
 // Đếm số stats
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
