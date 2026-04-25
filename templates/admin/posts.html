@@ -1,62 +1,1295 @@
-{% extends 'admin/base_admin.html' %}
-{% block title %}Quản lý bài viết{% endblock %}
-{% block page_title %}📰 Quản lý bài viết{% endblock %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMY — Trung tâm Can thiệp Tâm lý Giáo dục</title>
+<link href="htt...ap" rel="stylesheet">
+<style>
+/* ══════════════════════════
+TOKENS
 
-{% block content %}
-<div class="page-header">
-  <div>
-    <h2>Danh sách bài viết</h2>
-    <div class="breadcrumb">Tổng: {{ posts|length }} bài</div>
+══════════════════════════ */
+
+:root {
+  --blue:   #1558B0;
+  --sky:    #3A9BD5;
+  --navy:   #0B1829;
+  --mint:   #27B394;
+  --coral:  #E05A3A;
+  --white:  #ffffff;
+  --off:    #F4F7FB;
+  --ink:    #1A2332;
+  --muted:  #637282;
+  --border: #DDE3EC;
+  --r:      8px;
+}
+
+/* ══════════════════════════
+BASE
+
+══════════════════════════ */
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Be Vietnam Pro', sans-serif; background:#fff; color:var(--ink); overflow-x:hidden; line-height:1.6; }
+a { text-decoration:none; color:inherit; }
+img { display:block; max-width:100%; }
+
+.container { max-width:1160px; margin:0 auto; padding:0 40px; }
+
+/* ══════════════════════════
+TOP INFO BAR (như IPHD)
+
+══════════════════════════ */
+
+.topbar {
+  background:var(--blue);
+  padding:8px 0;
+  font-size:.78rem;
+  color:rgba(255,255,255,.85);
+}
+.topbar-inner {
+  display:flex; justify-content:flex-end; align-items:center; gap:28px;
+}
+.topbar-item {
+  display:flex; align-items:center; gap:6px;
+}
+.topbar-item a { color:rgba(255,255,255,.85); transition:color .2s; }
+.topbar-item a:hover { color:#fff; }
+
+/* ══════════════════════════
+NAV (trắng như IPHD)
+
+══════════════════════════ */
+
+nav {
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:200;
+  box-shadow:0 2px 12px rgba(11,24,41,.06);
+}
+.nav-inner {
+  height:72px; display:flex; align-items:center; justify-content:space-between;
+}
+.nav-logo { display:flex; align-items:center; gap:12px; }
+.logo-icon {
+  width:46px; height:46px; border-radius:10px;
+  background:linear-gradient(135deg, var(--blue), var(--sky));
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; font-weight:800; color:#fff;
+}
+.logo-text { line-height:1.2; }
+.logo-name { font-size:1.4rem; font-weight:800; color:var(--blue); letter-spacing:-.3px; }
+.logo-sub  { font-size:.62rem; color:var(--muted); font-weight:500; letter-spacing:.3px; }
+
+.nav-menu { display:flex; align-items:center; gap:2px; }
+.nav-menu a {
+  padding:8px 14px; border-radius:6px;
+  font-size:.85rem; font-weight:600; color:var(--ink);
+  transition:all .18s; white-space:nowrap;
+}
+.nav-menu a:hover { color:var(--blue); background:rgba(21,88,176,.06); }
+.nav-menu a.active { color:var(--blue); }
+
+.nav-cta {
+  padding:9px 22px; border-radius:6px;
+  background:var(--blue); color:#fff !important;
+  font-size:.84rem; font-weight:700;
+  box-shadow:0 3px 12px rgba(21,88,176,.3);
+  transition:all .2s; margin-left:8px;
+}
+.nav-cta:hover { background:#1264c8; transform:translateY(-1px); box-shadow:0 5px 18px rgba(21,88,176,.35); }
+
+/* ══════════════════════════
+HERO — clean 2 col
+
+══════════════════════════ */
+
+.hero {
+  background:linear-gradient(135deg, #EBF3FB 0%, #F4F7FB 60%, #EDF8F5 100%);
+  padding:72px 0 64px;
+  border-bottom:1px solid var(--border);
+}
+.hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+
+.hero-label {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(21,88,176,.08); border:1px solid rgba(21,88,176,.18);
+  padding:5px 14px; border-radius:4px;
+  font-size:.72rem; font-weight:700; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--blue);
+  margin-bottom:20px;
+}
+.hero h1 {
+  font-size:clamp(1.9rem, 3.5vw, 2.9rem);
+  font-weight:800; line-height:1.25;
+  color:var(--ink); margin-bottom:18px; letter-spacing:-.3px;
+}
+.hero h1 span { color:var(--blue); }
+.hero-desc {
+  font-size:.97rem; line-height:1.8; color:var(--muted);
+  margin-bottom:32px; font-weight:400;
+}
+.hero-btns { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:36px; }
+.btn-primary {
+  padding:12px 26px; border-radius:6px;
+  background:var(--blue); color:#fff;
+  font-size:.88rem; font-weight:700;
+  box-shadow:0 4px 16px rgba(21,88,176,.3);
+  transition:all .2s; display:inline-flex; align-items:center; gap:7px;
+}
+.btn-primary:hover { background:#1264c8; transform:translateY(-1px); }
+.btn-outline {
+  padding:11px 24px; border-radius:6px;
+  border:2px solid var(--blue); color:var(--blue);
+  font-size:.88rem; font-weight:700;
+  transition:all .2s; display:inline-flex; align-items:center; gap:7px;
+}
+.btn-outline:hover { background:var(--blue); color:#fff; }
+
+.hero-stats {
+  display:flex; gap:28px; padding-top:24px;
+  border-top:1px solid var(--border);
+}
+.hstat-num {
+  font-size:1.6rem; font-weight:800; color:var(--blue);
+  line-height:1; display:block;
+}
+.hstat-label { font-size:.72rem; color:var(--muted); margin-top:3px; font-weight:500; }
+
+/* RIGHT: Feature cards */
+.hero-cards { display:flex; flex-direction:column; gap:14px; }
+.hcard {
+  background:#fff; border-radius:10px; padding:18px 20px;
+  border:1px solid var(--border);
+  display:flex; align-items:center; gap:16px;
+  box-shadow:0 2px 12px rgba(11,24,41,.05);
+  transition:all .22s;
+}
+.hcard:hover { border-color:var(--blue); box-shadow:0 4px 20px rgba(21,88,176,.1); transform:translateX(4px); }
+.hcard-icon {
+  width:44px; height:44px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+}
+.hcard h4 { font-size:.9rem; font-weight:700; color:var(--ink); margin-bottom:2px; }
+.hcard p  { font-size:.76rem; color:var(--muted); line-height:1.4; }
+.hcard-arrow { margin-left:auto; color:var(--blue); font-size:.9rem; opacity:0; transition:opacity .2s; }
+.hcard:hover .hcard-arrow { opacity:1; }
+
+/* ══════════════════════════
+STATS BAND
+
+══════════════════════════ */
+
+.stats-band { background:var(--blue); padding:40px 0; }
+.stats-grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  divide-x: 1px solid rgba(255,255,255,.2);
+}
+.stat-item {
+  text-align:center; padding:12px 20px;
+  border-right:1px solid rgba(255,255,255,.2);
+}
+.stat-item:last-child { border-right:none; }
+.stat-num {
+  font-size:2.4rem; font-weight:800; color:#fff;
+  line-height:1; display:block; letter-spacing:-.5px;
+}
+.stat-unit { font-size:1.4rem; color:rgba(255,255,255,.7); }
+.stat-label { font-size:.75rem; color:rgba(255,255,255,.65); margin-top:6px; font-weight:500; }
+
+/* ══════════════════════════
+SECTION BASE
+
+══════════════════════════ */
+
+.section { padding:80px 0; }
+.section-alt { background:var(--off); }
+.sec-header { margin-bottom:48px; }
+.sec-header.center { text-align:center; }
+.sec-header.center .sec-sub { margin:0 auto; }
+.sec-tag {
+  font-size:.7rem; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; color:var(--blue);
+  margin-bottom:10px; display:block;
+}
+.sec-title {
+  font-size:clamp(1.6rem, 2.8vw, 2.2rem);
+  font-weight:800; line-height:1.25;
+  color:var(--ink); margin-bottom:12px; letter-spacing:-.3px;
+}
+.sec-sub {
+  font-size:.93rem; line-height:1.75; color:var(--muted);
+  max-width:580px; font-weight:400;
+}
+.sec-divider {
+  width:40px; height:3px; background:var(--blue);
+  border-radius:2px; margin:14px 0 0;
+}
+.sec-header.center .sec-divider { margin:14px auto 0; }
+
+/* ══════════════════════════
+SERVICES
+
+══════════════════════════ */
+
+.svc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.svc-card {
+  background:#fff; border-radius:10px; padding:28px 24px;
+  border:1px solid var(--border);
+  transition:all .25s; position:relative;
+  overflow:hidden;
+}
+.svc-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:var(--c, var(--blue));
+  transform:scaleX(0); transition:transform .25s; transform-origin:left;
+}
+.svc-card:hover { border-color:var(--c, var(--blue)); box-shadow:0 8px 32px rgba(11,24,41,.08); transform:translateY(-4px); }
+.svc-card:hover::after { transform:scaleX(1); }
+.svc-icon {
+  width:48px; height:48px; border-radius:8px; margin-bottom:16px;
+  display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+}
+.svc-card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; color:var(--ink); }
+.svc-card p  { font-size:.83rem; color:var(--muted); line-height:1.7; margin-bottom:14px; }
+.svc-link { font-size:.8rem; font-weight:700; color:var(--c, var(--blue)); display:inline-flex; align-items:center; gap:4px; transition:gap .2s; }
+.svc-card:hover .svc-link { gap:8px; }
+
+/* ══════════════════════════
+APPROACH (2 col)
+
+══════════════════════════ */
+
+.approach-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+.approach-img {
+  background:linear-gradient(135deg, var(--blue), var(--sky) 50%, var(--mint));
+  border-radius:12px; aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  font-size:6rem;
+  box-shadow:0 16px 48px rgba(21,88,176,.25);
+}
+.step-list { display:flex; flex-direction:column; gap:14px; }
+.step-item {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:16px 18px; border-radius:8px;
+  border:1px solid var(--border); background:#fff;
+  transition:all .2s;
+}
+.step-item:hover { border-color:var(--blue); box-shadow:0 4px 16px rgba(21,88,176,.08); }
+.step-num {
+  width:32px; height:32px; border-radius:6px; flex-shrink:0;
+  background:var(--c, var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.85rem; font-weight:800; color:#fff;
+}
+.step-item h4 { font-size:.9rem; font-weight:700; margin-bottom:3px; }
+.step-item p  { font-size:.8rem; color:var(--muted); line-height:1.55; }
+
+/* ══════════════════════════
+TEAM
+
+══════════════════════════ */
+
+.team-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+.team-card {
+  background:#fff; border-radius:10px; overflow:hidden;
+  border:1px solid var(--border);
+  transition:all .25s;
+}
+.team-card:hover { box-shadow:0 8px 32px rgba(11,24,41,.09); transform:translateY(-4px); }
+.team-img {
+  height:170px; display:flex; align-items:center; justify-content:center; font-size:4rem;
+}
+.team-body { padding:18px 20px 22px; border-top:1px solid var(--border); }
+.team-body h4 { font-size:.97rem; font-weight:700; margin-bottom:3px; }
+.team-role { font-size:.74rem; font-weight:600; color:var(--blue); margin-bottom:8px; }
+.team-body p { font-size:.8rem; color:var(--muted); line-height:1.6; }
+.team-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:12px; }
+.ttag {
+  padding:3px 10px; border-radius:4px; font-size:.67rem; font-weight:600;
+  background:var(--off); color:var(--muted); border:1px solid var(--border);
+}
+
+/* ══════════════════════════
+TESTIMONIALS
+
+══════════════════════════ */
+
+.test-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.test-card {
+  background:#fff; border-radius:10px; padding:26px 22px;
+  border:1px solid var(--border);
+  display:flex; flex-direction:column; gap:14px;
+  transition:all .25s;
+}
+.test-card:hover { border-color:var(--blue); box-shadow:0 6px 24px rgba(21,88,176,.08); }
+.test-stars { color:#F59E0B; font-size:.85rem; letter-spacing:2px; }
+.test-quote {
+  font-size:.88rem; color:#374151; line-height:1.75; flex:1;
+  font-style:italic; border-left:3px solid var(--blue);
+  padding-left:14px;
+}
+.test-author { display:flex; align-items:center; gap:10px; }
+.test-av {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg, var(--sky), var(--mint));
+  display:flex; align-items:center; justify-content:center; font-size:1rem;
+}
+.test-name { font-size:.84rem; font-weight:700; }
+.test-rel  { font-size:.71rem; color:var(--muted); margin-top:1px; }
+
+/* ══════════════════════════
+EVENTS
+
+══════════════════════════ */
+
+.events-inner {
+  display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start;
+}
+.event-list { display:flex; flex-direction:column; gap:12px; }
+.ev-item {
+  background:#fff; border-radius:8px; padding:16px 18px;
+  border:1px solid var(--border);
+  display:flex; align-items:center; gap:16px;
+  transition:all .2s;
+}
+.ev-item:hover { border-color:var(--blue); box-shadow:0 4px 16px rgba(21,88,176,.07); }
+.ev-date {
+  min-width:52px; text-align:center;
+  background:var(--blue); border-radius:6px; padding:8px 6px; flex-shrink:0;
+}
+.ev-day { font-size:1.5rem; font-weight:800; color:#fff; line-height:1; display:block; }
+.ev-mon { font-size:.6rem; color:rgba(255,255,255,.75); text-transform:uppercase; letter-spacing:1px; }
+.ev-body h4 { font-size:.88rem; font-weight:700; color:var(--ink); margin-bottom:3px; }
+.ev-body p  { font-size:.75rem; color:var(--muted); }
+.ev-tag {
+  margin-left:auto; flex-shrink:0;
+  padding:4px 12px; border-radius:4px; font-size:.68rem; font-weight:700;
+  background:rgba(39,179,148,.1); color:var(--mint);
+}
+.events-cta-box {
+  background:linear-gradient(135deg, var(--blue), var(--navy));
+  border-radius:12px; padding:32px 28px; color:#fff;
+  position:sticky; top:90px;
+}
+.events-cta-box h3 { font-size:1.2rem; font-weight:800; margin-bottom:10px; }
+.events-cta-box p  { font-size:.85rem; color:rgba(255,255,255,.65); line-height:1.7; margin-bottom:22px; }
+.events-cta-box a {
+  display:block; text-align:center; padding:11px 20px; border-radius:6px;
+  font-size:.85rem; font-weight:700; margin-bottom:10px; transition:all .2s;
+}
+.ecta-w { background:#fff; color:var(--navy); }
+.ecta-w:hover { background:#f0f0f0; }
+.ecta-g { background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.3); }
+.ecta-g:hover { background:rgba(255,255,255,.2); }
+
+/* ══════════════════════════
+BLOG
+
+══════════════════════════ */
+
+.blog-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+.blog-card {
+  background:#fff; border-radius:10px; overflow:hidden;
+  border:1px solid var(--border);
+  transition:all .25s; display:flex; flex-direction:column;
+}
+.blog-card:hover { box-shadow:0 8px 32px rgba(11,24,41,.08); transform:translateY(-4px); }
+.blog-img {
+  height:170px; display:flex; align-items:center; justify-content:center;
+  font-size:3rem; position:relative; overflow:hidden;
+}
+.blog-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.blog-cat {
+  position:absolute; top:10px; left:10px;
+  padding:3px 10px; border-radius:4px;
+  font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+  background:rgba(255,255,255,.92); color:var(--blue); z-index:2;
+}
+.blog-body { padding:16px 18px 20px; flex:1; display:flex; flex-direction:column; }
+.blog-body h4 {
+  font-size:.92rem; font-weight:700; line-height:1.4;
+  margin-bottom:7px; color:var(--ink);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.blog-body p { font-size:.8rem; color:var(--muted); line-height:1.65; flex:1; }
+.blog-footer {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
+  font-size:.72rem;
+}
+.blog-date { color:var(--muted); }
+.blog-read { color:var(--blue); font-weight:700; }
+
+/* ══════════════════════════
+CTA SECTION
+
+══════════════════════════ */
+
+.cta-section {
+  background:var(--blue); padding:72px 0;
+}
+.cta-inner { text-align:center; }
+.cta-inner h2 {
+  font-size:clamp(1.7rem, 3vw, 2.4rem);
+  font-weight:800; color:#fff; margin-bottom:12px; letter-spacing:-.3px;
+}
+.cta-inner p { font-size:.95rem; color:rgba(255,255,255,.7); margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto; }
+.cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.cta-btn-w {
+  padding:12px 28px; border-radius:6px; background:#fff; color:var(--blue);
+  font-size:.88rem; font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+  transition:all .2s; display:inline-flex; align-items:center; gap:7px;
+}
+.cta-btn-w:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.2); }
+.cta-btn-g {
+  padding:11px 26px; border-radius:6px;
+  border:2px solid rgba(255,255,255,.4); color:#fff;
+  font-size:.88rem; font-weight:700;
+  transition:all .2s; display:inline-flex; align-items:center; gap:7px;
+}
+.cta-btn-g:hover { border-color:#fff; background:rgba(255,255,255,.1); }
+
+/* ══════════════════════════
+CONTACT STRIP
+
+══════════════════════════ */
+
+.contact-strip { background:var(--off); padding:48px 0; border-top:1px solid var(--border); }
+.contact-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+.contact-item {
+  background:#fff; border-radius:8px; padding:18px 20px;
+  border:1px solid var(--border); display:flex; align-items:flex-start; gap:12px;
+  transition:border-color .2s;
+}
+.contact-item:hover { border-color:var(--blue); }
+.ci-icon {
+  width:38px; height:38px; border-radius:7px; flex-shrink:0;
+  background:rgba(21,88,176,.08);
+  display:flex; align-items:center; justify-content:center; font-size:1rem;
+}
+.ci-text h5 { font-size:.78rem; font-weight:700; margin-bottom:3px; color:var(--ink); }
+.ci-text p  { font-size:.77rem; color:var(--muted); line-height:1.5; }
+
+/* ══════════════════════════
+FOOTER
+
+══════════════════════════ */
+
+footer { background:var(--navy); padding:56px 0 24px; }
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:40px; }
+.footer-brand p { font-size:.8rem; color:rgba(255,255,255,.4); line-height:1.75; max-width:240px; margin:12px 0 18px; }
+.footer-socials { display:flex; gap:8px; }
+.fsoc {
+  width:34px; height:34px; border-radius:6px;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  display:flex; align-items:center; justify-content:center; font-size:.85rem;
+  transition:all .18s;
+}
+.fsoc:hover { background:var(--blue); border-color:var(--blue); }
+footer h5 { font-size:.85rem; font-weight:700; color:#fff; margin-bottom:14px; text-transform:uppercase; letter-spacing:.5px; }
+footer ul { list-style:none; display:flex; flex-direction:column; gap:8px; }
+footer ul li a { font-size:.8rem; color:rgba(255,255,255,.4); transition:color .2s; }
+footer ul li a:hover { color:#fff; }
+.footer-bottom {
+  padding-top:22px; border-top:1px solid rgba(255,255,255,.08);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.75rem; color:rgba(255,255,255,.28);
+}
+
+/* ══════════════════════════
+RESPONSIVE
+
+══════════════════════════ */
+
+/* ══════════════════════════
+HAMBURGER MENU
+
+══════════════════════════ */
+
+.hamburger {
+  display:none; flex-direction:column; gap:5px;
+  cursor:pointer; padding:8px; border:none; background:transparent;
+}
+.hamburger span {
+  width:24px; height:2px; background:var(--ink);
+  border-radius:2px; transition:all .3s;
+}
+.hamburger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2){ opacity:0; }
+.hamburger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+/* Mobile nav drawer */
+.mobile-nav {
+  position:fixed; inset:0; z-index:9999;
+  visibility:hidden; pointer-events:none;
+}
+.mobile-nav.open {
+  visibility:visible; pointer-events:all;
+}
+.mobile-nav-overlay {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,.5);
+  opacity:0; transition:opacity .3s ease;
+}
+.mobile-nav.open .mobile-nav-overlay { opacity:1; }
+.mobile-nav-drawer {
+  position:absolute; top:0; left:0; bottom:0; width:82%; max-width:300px;
+  background:#fff; box-shadow:4px 0 32px rgba(0,0,0,.2);
+  display:flex; flex-direction:column; overflow-y:auto;
+  transform:translateX(-100%); transition:transform .3s ease;
+  will-change:transform;
+}
+.mobile-nav.open .mobile-nav-drawer { transform:translateX(0); }
+.mobile-nav-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; border-bottom:1px solid var(--border);
+}
+.mobile-nav-links { padding:12px 0; flex:1; }
+.mobile-nav-links a {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 22px; font-size:.92rem; font-weight:600;
+  color:var(--ink); border-bottom:1px solid var(--border);
+  transition:all .18s;
+}
+.mobile-nav-links a:hover { background:var(--off); color:var(--blue); }
+.mobile-nav-links a .micon { font-size:1rem; width:20px; }
+.mobile-nav-footer { padding:16px 20px; border-top:1px solid var(--border); }
+.mobile-nav-footer .btn-primary { width:100%; justify-content:center; margin-bottom:10px; }
+.mobile-nav-footer .login-link {
+  display:block; text-align:center; font-size:.83rem;
+  font-weight:600; color:var(--muted); padding:8px;
+}
+
+/* ══════════════════════════
+RESPONSIVE — TABLET 960px
+
+══════════════════════════ */
+
+@media(max-width:960px){
+  /* Nav */
+  .nav-menu  { display:none; }
+  .nav-cta   { display:none; }
+  .hamburger { display:flex; }
+
+  /* Topbar */
+  .topbar-inner { justify-content:center; gap:16px; font-size:.72rem; }
+
+  /* Hero */
+  .hero-grid { grid-template-columns:1fr; gap:32px; }
+  .hero { padding:48px 0 40px; }
+  .hero h1 { font-size:2.2rem; }
+  .hero-cards { grid-template-columns:1fr 1fr; gap:12px; }
+  .hcard { padding:14px 16px; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns:repeat(4,1fr); }
+
+  /* Sections */
+  .section { padding:64px 0; }
+  .svc-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+  .approach-grid { grid-template-columns:1fr; gap:32px; }
+  .approach-img  { max-width:320px; margin:0 auto; aspect-ratio:16/9; }
+  .team-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+  .test-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+  .blog-grid  { grid-template-columns:1fr 1fr; gap:16px; }
+
+  /* Events */
+  .events-inner { grid-template-columns:1fr; gap:28px; }
+  .events-cta-box { position:static; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns:1fr 1fr; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns:1fr 1fr; gap:28px; }
+
+  /* CTA */
+  .cta-btns { gap:10px; }
+}
+
+/* ══════════════════════════
+RESPONSIVE — MOBILE 640px
+
+══════════════════════════ */
+
+@media(max-width:640px){
+  /* Container */
+  .container { padding:0 18px; }
+
+  /* Topbar — ẩn bớt */
+  .topbar-item:last-child { display:none; }
+
+  /* Nav */
+  .logo-sub { display:none; }
+
+  /* Hero */
+  .hero { padding:36px 0 32px; }
+  .hero h1 { font-size:1.9rem; line-height:1.2; }
+  .hero-label { font-size:.65rem; }
+  .hero-desc  { font-size:.9rem; }
+  .hero-btns  { flex-direction:column; gap:10px; }
+  .btn-primary, .btn-outline { width:100%; justify-content:center; }
+  .hero-cards { grid-template-columns:1fr 1fr; gap:10px; }
+  .hcard { padding:12px 14px; }
+  .hcard h4 { font-size:.82rem; }
+  .hcard p  { display:none; }
+  .hcard-arrow { display:none; }
+  .hero-stats { gap:16px; flex-wrap:wrap; }
+  .hstat-num  { font-size:1.3rem; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .stat-num   { font-size:2rem; }
+
+  /* Sections */
+  .section { padding:48px 0; }
+  .sec-title { font-size:1.55rem; }
+
+  /* Services */
+  .svc-grid { grid-template-columns:1fr; gap:14px; }
+  .svc-card { padding:22px 20px; }
+
+  /* Approach */
+  .step-item { padding:12px 14px; }
+
+  /* Team */
+  .team-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* Testimonials */
+  .test-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* Events */
+  .ev-item { padding:14px 16px; gap:12px; }
+  .ev-tag  { display:none; }
+
+  /* Blog */
+  .blog-grid { grid-template-columns:1fr; gap:14px; }
+
+  /* CTA */
+  .cta-section { padding:56px 0; }
+  .cta-inner h2 { font-size:1.6rem; }
+  .cta-btns { flex-direction:column; align-items:stretch; }
+  .cta-btn-w, .cta-btn-g { justify-content:center; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns:1fr; gap:12px; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns:1fr; gap:24px; }
+  .footer-brand p { max-width:100%; }
+  .foot-bottom { flex-direction:column; gap:8px; text-align:center; }
+
+  /* Sec header events */
+  .sec-header[style*="flex"] { flex-direction:column; align-items:flex-start; gap:12px; }
+}
+
+/* ══════════════════════════
+RESPONSIVE — SMALL 380px
+
+══════════════════════════ */
+
+@media(max-width:380px){
+  .container { padding:0 14px; }
+  .hero h1   { font-size:1.65rem; }
+  .hero-cards{ grid-template-columns:1fr; }
+  .hcard p   { display:none; }
+  .stats-grid{ grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP INFO BAR ══ -->
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-inner">
+      <div class="topbar-item">✉️ <a href="/cdn-cgi/l/email-protection#a4c...2ca"><span class="__cf_email__" data-cfemail="aec...8c0">[email&#160;protected]</span></a></div>
+      <div class="topbar-item">📞 <a href="tel:0962525703">0962 525 703</a></div>
+      <div class="topbar-item">⏰ Thứ 2 – Thứ 7: 7:30 – 18:00</div>
+    </div>
   </div>
-  <a href="{{ url_for('admin.add_post') }}" class="btn btn-primary">✍️ Viết bài mới</a>
 </div>
 
-<div class="card">
-  <div class="card-body">
-    {% if posts %}
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Tiêu đề</th><th>Danh mục</th><th>Tác giả</th><th>Lượt xem</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr>
-        </thead>
-        <tbody>
-          {% for p in posts %}
-          <tr>
-            <td><strong>{{ p.title }}</strong></td>
-            <td>
-              <span class="badge" style="background:#f0f4f8;color:#4a5e72">
-                {{ {'news':'📰 Tin tức','tips':'💡 Kiến thức','event':'📅 Sự kiện'}.get(p.category, p.category) }}
-              </span>
-            </td>
-            <td>{{ p.author.fullname if p.author else '—' }}</td>
-            <td>👁 {{ p.views }}</td>
-            <td>
-              <span class="badge {{ 'badge-confirmed' if p.is_published else 'badge-inactive' }}">
-                {{ '✅ Đã đăng' if p.is_published else '📝 Nháp' }}
-              </span>
-            </td>
-            <td><small style="color:#8a9ab0">{{ p.created_at.strftime('%d/%m/%Y') }}</small></td>
-            <td>
-              <div style="display:flex;gap:6px">
-                <a href="{{ url_for('admin.edit_post', id=p.id) }}" class="btn btn-primary btn-sm">✏️</a>
-                <form method="POST" action="{{ url_for('admin.delete_post', id=p.id) }}"
-                      onsubmit="return confirm('Xóa bài viết này?')">
-                  <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
-                </form>
-              </div>
-            </td>
-          </tr>
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="logo-icon">E</div>
+        <div class="logo-text">
+          <div class="logo-name">EMY</div>
+          <div class="logo-sub">Trung tâm Can thiệp Tâm lý Giáo dục</div>
+        </div>
+      </a>
+
+      <div class="nav-menu">
+        <a href="#services">Dịch vụ</a>
+        <a href="#approach">Phương pháp</a>
+        <a href="#team">Đội ngũ</a>
+        <a href="#events">Sự kiện</a>
+        <a href="#blog">Blog</a>
+        <a href="#contact">Liên hệ</a>
+        <a href="{{ url_for('auth.login') }}" style="color:var(--muted)">Đăng nhập</a>
+      </div>
+
+      <a href="{{ url_for('public.register_test') }}" class="nav-cta">Đăng ký tư vấn</a>
+
+      <!-- Hamburger button (mobile) -->
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MOBILE NAV DRAWER ══ -->
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-overlay" onclick="closeMenu()"></div>
+  <div class="mobile-nav-drawer">
+    <div class="mobile-nav-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="logo-icon" style="width:36px;height:36px;font-size:1.1rem">E</div>
+        <div><div class="logo-name" style="font-size:1.2rem">EMY</div></div>
+      </div>
+      <button onclick="closeMenu()" style="border:none;background:none;font-size:1.3rem;cursor:pointer;color:var(--muted);padding:4px">✕</button>
+    </div>
+    <div class="mobile-nav-links">
+      <a href="#services" onclick="closeMenu()"><span class="micon">🧩</span> Dịch vụ</a>
+      <a href="#approach" onclick="closeMenu()"><span class="micon">🔬</span> Phương pháp</a>
+      <a href="#team"     onclick="closeMenu()"><span class="micon">👥</span> Đội ngũ</a>
+      <a href="#events"   onclick="closeMenu()"><span class="micon">📅</span> Sự kiện</a>
+      <a href="#blog"     onclick="closeMenu()"><span class="micon">📰</span> Blog</a>
+      <a href="{{ url_for('public.faq') }}"   onclick="closeMenu()"><span class="micon">❓</span> Hỏi đáp</a>
+      <a href="#contact"  onclick="closeMenu()"><span class="micon">📍</span> Liên hệ</a>
+    </div>
+    <div class="mobile-nav-footer">
+      <a href="{{ url_for('public.register_test') }}" class="btn-primary" onclick="closeMenu()" style="display:flex;justify-content:center;margin-bottom:10px">📋 Đăng ký tư vấn miễn phí</a>
+      <a href="{{ url_for('auth.login') }}" class="login-link" onclick="closeMenu()">🔐 Đăng nhập nội bộ</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HAMBURGER JS (đặt ngay đây để load trước onclick) ══ -->
+<script>
+function toggleMenu() {
+  var nav = document.getElementById('mobileNav');
+  var btn = document.getElementById('hamburger');
+  if(!nav || !btn) return;
+  if(nav.classList.contains('open')) {
+    nav.classList.remove('open');
+    btn.classList.remove('open');
+    document.body.style.overflow = '';
+  } else {
+    nav.classList.add('open');
+    btn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeMenu() {
+  var nav = document.getElementById('mobileNav');
+  var btn = document.getElementById('hamburger');
+  if(nav) nav.classList.remove('open');
+  if(btn) btn.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') closeMenu();
+});
+</script>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <!-- LEFT -->
+      <div>
+        <div class="hero-label">🌟 Trung tâm giáo dục trẻ đặc biệt TP.HCM</div>
+        <h1>Đồng hành cùng con<br>trên hành trình<br><span>phát triển toàn diện</span></h1>
+        <p class="hero-desc">EMY chuyên can thiệp tâm lý, giáo dục và phát triển toàn diện cho trẻ tự kỷ, chậm phát triển và trẻ có nhu cầu đặc biệt — bằng khoa học và tình yêu thương.</p>
+        <div class="hero-btns">
+          <a href="{{ url_for('public.register_test') }}" class="btn-primary">📋 Đăng ký đánh giá miễn phí</a>
+          <a href="#services" class="btn-outline">Xem dịch vụ</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <span class="hstat-num" data-target="500">500+</span>
+            <div class="hstat-label">Trẻ được hỗ trợ</div>
+          </div>
+          <div>
+            <span class="hstat-num" data-target="12">12+</span>
+            <div class="hstat-label">Năm kinh nghiệm</div>
+          </div>
+          <div>
+            <span class="hstat-num" data-target="35">35</span>
+            <div class="hstat-label">Chuyên gia</div>
+          </div>
+          <div>
+            <span class="hstat-num">94%</span>
+            <div class="hstat-label">Phụ huynh hài lòng</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="hero-cards">
+        <div class="hcard">
+          <div class="hcard-icon" style="background:rgba(21,88,176,.08)">🧩</div>
+          <div>
+            <h4>Can thiệp sớm ABA</h4>
+            <p>Phương pháp được công nhận quốc tế, hiệu quả cao</p>
+          </div>
+          <div class="hcard-arrow">→</div>
+        </div>
+        <div class="hcard">
+          <div class="hcard-icon" style="background:rgba(39,179,148,.08)">🗣️</div>
+          <div>
+            <h4>Trị liệu ngôn ngữ</h4>
+            <p>Phát triển giao tiếp lời nói và phi lời nói</p>
+          </div>
+          <div class="hcard-arrow">→</div>
+        </div>
+        <div class="hcard">
+          <div class="hcard-icon" style="background:rgba(224,90,58,.08)">📈</div>
+          <div>
+            <h4>Báo cáo tiến trình</h4>
+            <p>Theo dõi và đánh giá sự phát triển hàng tháng</p>
+          </div>
+          <div class="hcard-arrow">→</div>
+        </div>
+        <div class="hcard">
+          <div class="hcard-icon" style="background:rgba(106,90,205,.08)">👨‍👩‍👧</div>
+          <div>
+            <h4>Hỗ trợ gia đình</h4>
+            <p>Đào tạo phụ huynh kỹ năng can thiệp tại nhà</p>
+          </div>
+          <div class="hcard-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS BAND ══ -->
+<div class="stats-band">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item"><span class="stat-num" data-target="500">0<span class="stat-unit">+</span></span><div class="stat-label">Trẻ được hỗ trợ</div></div>
+      <div class="stat-item"><span class="stat-num" data-target="12">0<span class="stat-unit">+</span></span><div class="stat-label">Năm kinh nghiệm</div></div>
+      <div class="stat-item"><span class="stat-num" data-target="35">0</span><div class="stat-label">Chuyên gia & Giáo viên</div></div>
+      <div class="stat-item"><span class="stat-num" data-target="94">0<span class="stat-unit">%</span></span><div class="stat-label">Phụ huynh hài lòng</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SERVICES ══ -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="sec-header center">
+      <span class="sec-tag">Dịch vụ</span>
+      <h2 class="sec-title">Chương trình can thiệp toàn diện</h2>
+      <p class="sec-sub">Mỗi dịch vụ được cá nhân hóa theo nhu cầu và tiềm năng riêng của từng trẻ.</p>
+      <div class="sec-divider"></div>
+    </div>
+    <div class="svc-grid">
+      {% if services %}
+        {% for s in services %}
+        <div class="svc-card" style="--c:{{ s.color }}">
+          <div class="svc-icon" style="background:color-mix(in srgb,{{ s.color }} 10%,transparent)">{{ s.icon }}</div>
+          <h3>{{ s.name }}</h3>
+          <p>{{ s.short_desc }}</p>
+          <a href="{{ url_for('public.service_detail', slug=s.slug) }}" class="svc-link" style="color:{{ s.color }}">Tìm hiểu thêm →</a>
+        </div>
+        {% endfor %}
+      {% else %}
+        {# Fallback nếu chưa có dữ liệu #}
+        {% set fallback = [
+          ('🧩','var(--blue)','rgba(21,88,176,.08)','can-thiep-aba','Can thiệp hành vi ABA','Phân tích hành vi ứng dụng, giúp trẻ học kỹ năng mới và tăng cường giao tiếp xã hội.'),
+          ('🗣️','var(--mint)','rgba(39,179,148,.08)','tri-lieu-ngon-ngu','Trị liệu ngôn ngữ','Phát triển khả năng giao tiếp lời nói, phi lời nói và ngôn ngữ hiểu biểu đạt.'),
+          ('🤸','#D97706','rgba(217,119,6,.08)','tri-lieu-van-dong','Trị liệu vận động','Cải thiện kỹ năng vận động thô và tinh, điều hòa cảm giác và tự phục vụ.'),
+          ('🎵','#6A5ACD','rgba(106,90,205,.08)','am-nhac-nghe-thuat','Âm nhạc & Nghệ thuật','Khai mở cảm xúc, tăng tập trung và niềm vui học tập qua âm nhạc và nghệ thuật.'),
+          ('📚','var(--coral)','rgba(224,90,58,.08)','giao-duc-hoa-nhap','Giáo dục hòa nhập','Chuẩn bị cho trẻ bước vào môi trường học tập thông thường tự tin.'),
+          ('👨‍👩‍👧','var(--sky)','rgba(58,155,213,.08)','dao-tao-phu-huynh','Đào tạo phụ huynh','Hướng dẫn cha mẹ kỹ năng can thiệp tại nhà và kết nối cộng đồng.'),
+        ] %}
+        {% for icon,color,bg,slug,name,desc in fallback %}
+        <div class="svc-card" style="--c:{{ color }}">
+          <div class="svc-icon" style="background:{{ bg }}">{{ icon }}</div>
+          <h3>{{ name }}</h3>
+          <p>{{ desc }}</p>
+          <a href="{{ url_for('public.service_detail', slug=slug) }}" class="svc-link" style="color:{{ color }}">Tìm hiểu thêm →</a>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div style="text-align:center;margin-top:36px">
+      <a href="{{ url_for('public.register_test') }}" class="btn-primary">📋 Đăng ký đánh giá ngay</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ APPROACH ══ -->
+<section class="section section-alt" id="approach">
+  <div class="container">
+    <div class="approach-grid">
+      <div class="approach-img">🌟</div>
+      <div>
+        <div class="sec-header">
+          <span class="sec-tag">Phương pháp</span>
+          <h2 class="sec-title">Tiếp cận khoa học,<br>trái tim yêu thương</h2>
+          <p class="sec-sub">Kết hợp các phương pháp can thiệp dựa trên bằng chứng quốc tế với sự đồng cảm và tình yêu vô điều kiện.</p>
+          <div class="sec-divider"></div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num" style="--c:var(--blue)">1</div>
+            <div><h4>Đánh giá toàn diện</h4><p>Đánh giá sâu 5 lĩnh vực: ngôn ngữ, nhận thức, vận động, xã hội và hành vi.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:var(--mint)">2</div>
+            <div><h4>Lập kế hoạch cá nhân (IEP)</h4><p>Xây dựng kế hoạch giáo dục cá nhân phù hợp với tiềm năng riêng của từng trẻ.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:#6A5ACD">3</div>
+            <div><h4>Can thiệp tích hợp</h4><p>Kết hợp ABA, PECS, Floor Time, RDI trong môi trường vui vẻ và an toàn.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:var(--coral)">4</div>
+            <div><h4>Theo dõi & điều chỉnh</h4><p>Báo cáo tiến trình định kỳ và họp phụ huynh hàng tháng để điều chỉnh kế hoạch.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TEAM ══ -->
+<section class="section" id="team">
+  <div class="container">
+    <div class="sec-header center">
+      <span class="sec-tag">Đội ngũ</span>
+      <h2 class="sec-title">Những người đồng hành</h2>
+      <p class="sec-sub">Chuyên gia được đào tạo bài bản từ các trường đại học và tổ chức quốc tế uy tín.</p>
+      <div class="sec-divider"></div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-img" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">👩‍⚕️</div>
+        <div class="team-body">
+          <h4>TS. Nguyễn Thị Lan Anh</h4>
+          <div class="team-role">Giám đốc chuyên môn · Tâm lý học phát triển</div>
+          <p>15 năm kinh nghiệm. Tiến sĩ Đại học Quốc gia Singapore.</p>
+          <div class="team-tags"><span class="ttag">Tự kỷ</span><span class="ttag">ADHD</span><span class="ttag">ABA</span></div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-img" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0)">👨‍🏫</div>
+        <div class="team-body">
+          <h4>ThS. Trần Minh Khoa</h4>
+          <div class="team-role">Chuyên gia ABA · BCBA Certified</div>
+          <p>Chứng chỉ BCBA quốc tế. Chuyên sâu phân tích hành vi ứng dụng.</p>
+          <div class="team-tags"><span class="ttag">BCBA</span><span class="ttag">VB-MAPP</span><span class="ttag">Hành vi</span></div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-img" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">👩‍🎨</div>
+        <div class="team-body">
+          <h4>CN. Phạm Thúy Hằng</h4>
+          <div class="team-role">Chuyên gia Ngôn ngữ trị liệu</div>
+          <p>Tốt nghiệp ĐH Y Hà Nội. 10 năm kinh nghiệm trị liệu giao tiếp.</p>
+          <div class="team-tags"><span class="ttag">PECS</span><span class="ttag">AAC</span><span class="ttag">Ngôn ngữ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="section section-alt" id="testimonials">
+  <div class="container">
+    <div class="sec-header center">
+      <span class="sec-tag">Chia sẻ</span>
+      <h2 class="sec-title">Phụ huynh nói về EMY</h2>
+      <p class="sec-sub">Niềm tin của các gia đình là động lực lớn nhất để chúng tôi không ngừng cải tiến.</p>
+      <div class="sec-divider"></div>
+    </div>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">Con tôi không nói được một từ khi mới đến EMY. Sau 8 tháng, bé đã nói câu ngắn và gọi "mẹ" lần đầu tiên. Tôi đã khóc vì hạnh phúc!</p>
+        <div class="test-author">
+          <div class="test-av">👩</div>
+          <div><div class="test-name">Chị Thanh Hương</div><div class="test-rel">Mẹ bé Minh · 5 tuổi · ASD</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">Đội ngũ EMY không chỉ dạy con mà còn đồng hành cùng cả gia đình. Chúng tôi được đào tạo hỗ trợ con tại nhà hiệu quả hơn rất nhiều.</p>
+        <div class="test-author">
+          <div class="test-av">👨</div>
+          <div><div class="test-name">Anh Đức Thành</div><div class="test-rel">Bố bé Nam · 7 tuổi · ADHD</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">Sau 1 năm học tại EMY, con gái tôi đã vào được lớp 1 trường bình thường. Điều mà trước đây chúng tôi không dám mơ đến!</p>
+        <div class="test-author">
+          <div class="test-av">👩</div>
+          <div><div class="test-name">Chị Mai Phương</div><div class="test-rel">Mẹ bé Khánh · 6 tuổi</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ EVENTS ══ -->
+<section class="section" id="events">
+  <div class="container">
+    <div class="sec-header">
+      <span class="sec-tag">Sự kiện</span>
+      <h2 class="sec-title">Lịch khai giảng & Sự kiện</h2>
+      <div class="sec-divider"></div>
+    </div>
+    <div class="events-inner">
+      <div class="event-list">
+        {% if events %}
+          {% for e in events %}
+          <div class="ev-item">
+            <div class="ev-date"><span class="ev-day">{{ e.start_date.strftime('%d') }}</span><span class="ev-mon">{{ e.start_date.strftime('%b') }}</span></div>
+            <div class="ev-body"><h4>{{ e.title }}</h4><p>{{ e.location or 'EMY Center' }} · {{ e.start_date.strftime('%H:%M') }}</p></div>
+            <span class="ev-tag">Sự kiện</span>
+          </div>
           {% endfor %}
-        </tbody>
-      </table>
+        {% else %}
+          <div class="ev-item">
+            <div class="ev-date"><span class="ev-day">20</span><span class="ev-mon">Apr</span></div>
+            <div class="ev-body"><h4>Khai giảng lớp Can thiệp ABA — Khóa 12</h4><p>EMY Center, Q.3 · 08:00</p></div>
+            <span class="ev-tag">Khai giảng</span>
+          </div>
+          <div class="ev-item">
+            <div class="ev-date"><span class="ev-day">05</span><span class="ev-mon">May</span></div>
+            <div class="ev-body"><h4>Hội thảo: Nhận biết sớm dấu hiệu tự kỷ</h4><p>Online · 19:00 – Miễn phí</p></div>
+            <span class="ev-tag">Hội thảo</span>
+          </div>
+          <div class="ev-item">
+            <div class="ev-date"><span class="ev-day">12</span><span class="ev-mon">May</span></div>
+            <div class="ev-body"><h4>Workshop phụ huynh: Kỹ năng hỗ trợ con tại nhà</h4><p>EMY Center · 14:00 – 17:00</p></div>
+            <span class="ev-tag">Workshop</span>
+          </div>
+          <div class="ev-item">
+            <div class="ev-date"><span class="ev-day">25</span><span class="ev-mon">May</span></div>
+            <div class="ev-body"><h4>Ngày hội trẻ đặc biệt — EMY Open Day</h4><p>EMY Center · 08:00 – 17:00</p></div>
+            <span class="ev-tag">Sự kiện</span>
+          </div>
+        {% endif %}
+        <div style="margin-top:8px">
+          <a href="{{ url_for('public.events') }}" class="btn-outline" style="font-size:.84rem;padding:10px 22px">Xem tất cả sự kiện →</a>
+        </div>
+      </div>
+
+      <div class="events-cta-box">
+        <h3>🌟 Bắt đầu hành trình cùng EMY</h3>
+        <p>Đặt lịch đánh giá miễn phí — đội ngũ chuyên gia EMY sẽ liên hệ trong vòng 24 giờ.</p>
+        <a href="{{ url_for('public.register_test') }}" class="ecta-w">📋 Đăng ký đánh giá miễn phí</a>
+        <a href="{{ url_for('public.consultation') }}" class="ecta-g">📞 Đăng ký tư vấn</a>
+        <a href="{{ url_for('public.faq') }}" class="ecta-g">❓ Câu hỏi thường gặp</a>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.15);font-size:.75rem;color:rgba(255,255,255,.5)">
+          📞 0909 888 999 · T2–T7: 7:30–18:00
+        </div>
+      </div>
     </div>
-    {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">📝</div>
-      <p>Chưa có bài viết nào.</p>
-      <a href="{{ url_for('admin.add_post') }}" class="btn btn-primary" style="margin-top:12px">✍️ Viết bài đầu tiên</a>
+  </div>
+</section>
+
+<!-- ══ BLOG ══ -->
+<section class="section section-alt" id="blog">
+  <div class="container">
+    <div class="sec-header" style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px">
+      <div>
+        <span class="sec-tag">Kiến thức</span>
+        <h2 class="sec-title" style="margin-bottom:0">Bài viết mới nhất</h2>
+        <div class="sec-divider"></div>
+      </div>
+      <a href="{{ url_for('public.blog') }}" class="btn-outline" style="font-size:.82rem;padding:9px 20px;white-space:nowrap">Xem tất cả →</a>
     </div>
-    {% endif %}
+    <div class="blog-grid">
+      {% set bg_map = {'news':'linear-gradient(135deg,#dbeafe,#bfdbfe)','tips':'linear-gradient(135deg,#d1fae5,#a7f3d0)','event':'linear-gradient(135deg,#fef3c7,#fde68a)'} %}
+      {% set cat_map = {'news':'Tin tức','tips':'Kiến thức','event':'Sự kiện'} %}
+      {% set emoji_map = {'news':'📰','tips':'💡','event':'📅'} %}
+
+      {% if posts %}
+        {% for p in posts %}
+        {% set mt = get_media_type(p.thumbnail) if p.thumbnail else None %}
+        <a href="{{ url_for('public.blog_detail', post_id=p.id) }}" class="blog-card">
+          <div class="blog-img" style="background:{{ bg_map.get(p.category,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
+
+            {# Hiển thị ảnh/video thumbnail nếu có #}
+            {% if mt == 'image' %}
+              <img src="{{ url_for('static', filename=p.thumbnail) }}" alt="{{ p.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+            {% elif mt == 'image_url' %}
+              <img src="{{ p.thumbnail }}" alt="{{ p.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+            {% elif mt == 'youtube' %}
+              {% set yid = p.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in p.thumbnail else p.thumbnail.split('/')[-1] %}
+              <img src="https://img.youtube.com/vi/{{ yid }}/mqdefault.jpg" alt="{{ p.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2">
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:1rem;">▶</div>
+              </div>
+            {% elif mt == 'video' %}
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0B1829,#1558B0)">
+                <div style="font-size:2.5rem">🎬</div>
+              </div>
+            {% else %}
+              {# Không có media → emoji mặc định #}
+              {{ emoji_map.get(p.category,'📰') }}
+            {% endif %}
+
+            <span class="blog-cat">{{ cat_map.get(p.category,'Bài viết') }}</span>
+          </div>
+          <div class="blog-body">
+            <h4>{{ p.title }}</h4>
+            <p>{{ p.summary or p.content|striptags|truncate(90) }}</p>
+            <div class="blog-footer">
+              <span class="blog-date">📅 {{ p.created_at.strftime('%d/%m/%Y') }}</span>
+              <span class="blog-read">Đọc thêm →</span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+
+      {% else %}
+        {# Placeholder khi chưa có bài viết nào được đăng #}
+        {% set demo = [
+          ('📰','news','5 dấu hiệu nhận biết tự kỷ sớm ở trẻ dưới 3 tuổi','Phát hiện sớm là chìa khóa giúp trẻ có cơ hội can thiệp hiệu quả nhất...','15/03/2026'),
+          ('💡','tips','ABA là gì? Phương pháp can thiệp hiệu quả nhất hiện nay','Applied Behavior Analysis — phương pháp được nghiên cứu bài bản nhất...','10/03/2026'),
+          ('💡','tips','10 điều cha mẹ nên làm mỗi ngày để hỗ trợ trẻ tự kỷ','Những thói quen nhỏ mỗi ngày có thể tạo ra sự khác biệt lớn...','05/03/2026'),
+        ] %}
+        {% for emoji,cat,title,desc,date in demo %}
+        <div class="blog-card" style="cursor:default">
+          <div class="blog-img" style="background:{{ bg_map.get(cat,'linear-gradient(135deg,#dbeafe,#bfdbfe)') }}">
+            {{ emoji }}
+            <span class="blog-cat">{{ cat_map.get(cat,'Bài viết') }}</span>
+          </div>
+          <div class="blog-body">
+            <h4>{{ title }}</h4>
+            <p>{{ desc }}</p>
+            <div class="blog-footer">
+              <span class="blog-date">📅 {{ date }}</span>
+              <span class="blog-read" style="color:var(--muted)">Sắp có →</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="cta-section">
+  <div class="container cta-inner">
+    <h2>Sẵn sàng đồng hành cùng con hôm nay?</h2>
+    <p>Đặt lịch đánh giá miễn phí — đội ngũ chuyên gia EMY sẽ liên hệ trong vòng 24 giờ.</p>
+    <div class="cta-btns">
+      <a href="{{ url_for('public.register_test') }}" class="cta-btn-w">📋 Đăng ký đánh giá miễn phí</a>
+      <a href="{{ url_for('public.consultation') }}" class="cta-btn-g">📞 Đăng ký tư vấn</a>
+      <a href="{{ url_for('public.faq') }}" class="cta-btn-g">❓ Câu hỏi thường gặp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<div class="contact-strip" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-item"><div class="ci-icon">📍</div><div class="ci-text"><h5>Địa chỉ</h5><p>2B Đường 22 khu phố 4, Phường Hiệp Bình, TP.HCM</p></div></div>
+      <div class="contact-item"><div class="ci-icon">📞</div><div class="ci-text"><h5>Hotline</h5><p>0962 525 703<br>T2–T7: 7:30–18:00</p></div></div>
+      <div class="contact-item"><div class="ci-icon">✉️</div><div class="ci-text"><h5>Email</h5><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="315...75f">[email&#160;protected]</a></p></div></div>
+      <div class="contact-item"> 
+  <div class="ci-icon">💬</div>
+  <div class="ci-text">
+    <h5>Zalo / Facebook</h5>
+    <p>
+      <a href="https://www.facebook.com/share/1L4m4r9ztP/?mibextid=wwXIfr" target="_blank">
+        EMY — Can thiệp Tâm lý GD
+      </a>
+    </p>
   </div>
 </div>
-{% endblock %}
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo" style="margin-bottom:0">
+          <div class="logo-icon">E</div>
+          <div class="logo-text"><div class="logo-name">EMY</div><div class="logo-sub" style="color:rgba(255,255,255,.4)">Can thiệp Tâm lý Giáo dục</div></div>
+        </div>
+        <p>Trung tâm Can thiệp Tâm lý Giáo dục. Đồng hành cùng mọi trẻ em trên hành trình phát triển toàn diện.</p>
+        <div class="footer-socials">
+          <a class="fsoc" href="#">📘</a><a class="fsoc" href="#">📸</a>
+          <a class="fsoc" href="#">▶️</a><a class="fsoc" href="#">💬</a>
+        </div>
+      </div>
+      <div>
+        <h5>Dịch vụ</h5>
+        <ul>
+          <li><a href="{{ url_for('public.consultation') }}">Can thiệp ABA</a></li>
+          <li><a href="{{ url_for('public.consultation') }}">Trị liệu ngôn ngữ</a></li>
+          <li><a href="{{ url_for('public.consultation') }}">Trị liệu vận động</a></li>
+          <li><a href="{{ url_for('public.consultation') }}">Âm nhạc trị liệu</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Phụ huynh</h5>
+        <ul>
+          <li><a href="{{ url_for('public.register_test') }}">Đăng ký đánh giá</a></li>
+          <li><a href="{{ url_for('public.consultation') }}">Đăng ký tư vấn</a></li>
+          <li><a href="{{ url_for('public.blog') }}">Blog kiến thức</a></li>
+          <li><a href="{{ url_for('public.events') }}">Lịch sự kiện</a></li>
+          <li><a href="{{ url_for('public.faq') }}">Hỏi đáp FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Trung tâm</h5>
+        <ul>
+          <li><a href="#">Về chúng tôi</a></li>
+          <li><a href="#">Đội ngũ chuyên gia</a></li>
+          <li><a href="#">Câu chuyện thành công</a></li>
+          <li><a href="{{ url_for('auth.login') }}">🔐 Đăng nhập nội bộ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 EMY Center. All rights reserved.</span>
+      <span>Made with ❤️ for every special child</span>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Đếm số stats
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(!e.isIntersecting) return;
+    document.querySelectorAll('.stat-num[data-target]').forEach(el => {
+      const t = +el.dataset.target;
+      const su = el.querySelector('.stat-unit')?.outerHTML || '';
+      let c = 0; const inc = t/60;
+      const ti = setInterval(() => {
+        c += inc;
+        if(c >= t){ c = t; clearInterval(ti); }
+        el.innerHTML = Math.floor(c) + su;
+      }, 16);
+    });
+    obs.disconnect();
+  });
+}, { threshold:0.5 });
+const band = document.querySelector('.stats-band');
+if(band) obs.observe(band);
+
+// Active nav
+const secs = document.query

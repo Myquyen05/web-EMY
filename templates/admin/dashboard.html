@@ -3,43 +3,56 @@
 {% block page_title %}📊 Dashboard{% endblock %}
 
 {% block content %}
-
 <!-- STAT CARDS -->
 <div class="stat-grid">
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(109,184,242,.15)">👥</div>
+    <div class="stat-icon" style="background:rgba(21,88,176,.1)">👥</div>
     <div>
       <div class="stat-num">{{ stats.students }}</div>
       <div class="stat-label">Học sinh đang học</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(78,203,163,.15)">📰</div>
+    <div class="stat-icon" style="background:rgba(39,179,148,.1)">📰</div>
     <div>
       <div class="stat-num">{{ stats.posts }}</div>
       <div class="stat-label">Bài viết đã đăng</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(255,209,102,.2)">📝</div>
+    <div class="stat-icon" style="background:rgba(217,119,6,.1)">📝</div>
     <div>
       <div class="stat-num" style="color:#d97706">{{ stats.registrations }}</div>
-      <div class="stat-label">Đăng ký test chờ duyệt</div>
+      <div class="stat-label">Đăng ký chờ duyệt</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(255,127,127,.15)">📞</div>
+    <div class="stat-icon" style="background:rgba(224,90,58,.1)">📞</div>
     <div>
-      <div class="stat-num" style="color:#dc2626">{{ stats.consultations }}</div>
+      <div class="stat-num" style="color:#e05a3a">{{ stats.consultations }}</div>
       <div class="stat-label">Tư vấn chưa xử lý</div>
     </div>
   </div>
 </div>
 
-<!-- 2 COLUMNS -->
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+<!-- QUICK ACTIONS -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-header"><h3>⚡ Thao tác nhanh</h3></div>
+  <div class="card-body" style="padding:16px 18px;display:flex;gap:10px;flex-wrap:wrap">
+    <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary">➕ Thêm học sinh</a>
+    <a href="{{ url_for('admin.add_post') }}"    class="btn btn-success">✍️ Viết bài mới</a>
+    <a href="{{ url_for('admin.registrations') }}" class="btn btn-secondary">📋 Xem đăng ký</a>
+    <a href="{{ url_for('admin.progress') }}"    class="btn btn-secondary">📈 Tiến trình</a>
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('admin.add_account') }}" class="btn btn-secondary">👤 Thêm tài khoản</a>
+    {% endif %}
+  </div>
+</div>
 
-  <!-- ĐĂNG KÝ TEST GẦN ĐÂY -->
+<!-- 2 COLS -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+  <!-- ĐĂNG KÝ GẦN ĐÂY -->
   <div class="card">
     <div class="card-header">
       <h3>📝 Đăng ký test gần đây</h3>
@@ -49,75 +62,54 @@
       {% if recent_regs %}
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr><th>Tên bé</th><th>Phụ huynh</th><th>Trạng thái</th></tr>
-          </thead>
+          <thead><tr><th>Tên bé</th><th>Phụ huynh</th><th>Trạng thái</th></tr></thead>
           <tbody>
             {% for r in recent_regs %}
             <tr>
-              <td><strong>{{ r.child_name }}</strong><br><small style="color:#8a9ab0">{{ r.child_age }}</small></td>
-              <td>{{ r.parent_name }}<br><small style="color:#8a9ab0">{{ r.parent_phone }}</small></td>
-              <td>
-                <span class="badge badge-{{ r.status }}">
-                  {{ {'pending':'Chờ duyệt','confirmed':'Đã xác nhận','done':'Hoàn tất'}[r.status] }}
-                </span>
-              </td>
+              <td><strong>{{ r.child_name }}</strong><br><small style="color:var(--muted)">{{ r.child_age }}</small></td>
+              <td>{{ r.parent_name }}<br><small style="color:var(--muted)">{{ r.parent_phone }}</small></td>
+              <td><span class="badge badge-{{ r.status }}">{{ {'pending':'Chờ','confirmed':'Xác nhận','done':'Xong'}[r.status] }}</span></td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="empty-state"><div class="empty-icon">📭</div><p>Chưa có đăng ký nào</p></div>
+      <div class="empty-state"><div class="empty-icon">📭</div><p>Chưa có đăng ký</p></div>
       {% endif %}
     </div>
   </div>
 
   <!-- TƯ VẤN GẦN ĐÂY -->
   <div class="card">
-    <div class="card-header">
-      <h3>📞 Tư vấn gần đây</h3>
-    </div>
+    <div class="card-header"><h3>📞 Tư vấn gần đây</h3></div>
     <div class="card-body">
       {% if recent_cons %}
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr><th>Họ tên</th><th>Điện thoại</th><th>Dịch vụ</th></tr>
-          </thead>
+          <thead><tr><th>Họ tên</th><th>ĐT</th><th>Dịch vụ</th></tr></thead>
           <tbody>
             {% for c in recent_cons %}
             <tr>
               <td><strong>{{ c.fullname }}</strong></td>
               <td>{{ c.phone }}</td>
-              <td><small style="color:#637282">{{ c.service or '—' }}</small></td>
+              <td><small style="color:var(--muted)">{{ c.service or '—' }}</small></td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="empty-state"><div class="empty-icon">📭</div><p>Chưa có yêu cầu tư vấn</p></div>
+      <div class="empty-state"><div class="empty-icon">📭</div><p>Chưa có yêu cầu</p></div>
       {% endif %}
     </div>
   </div>
 
 </div>
 
-<!-- QUICK ACTIONS -->
-<div style="margin-top:20px">
-  <div class="card">
-    <div class="card-header"><h3>⚡ Thao tác nhanh</h3></div>
-    <div class="card-body" style="padding:20px; display:flex; gap:12px; flex-wrap:wrap">
-      <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary">➕ Thêm học sinh</a>
-      <a href="{{ url_for('admin.add_post') }}" class="btn btn-success">✍️ Đăng bài viết</a>
-      <a href="{{ url_for('admin.registrations') }}" class="btn btn-secondary">📋 Xem đăng ký test</a>
-      <a href="{{ url_for('admin.progress') }}" class="btn btn-secondary">📈 Ghi tiến trình</a>
-      {% if current_user.role == 'admin' %}
-      <a href="{{ url_for('admin.add_account') }}" class="btn btn-secondary">👤 Tạo tài khoản</a>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
+<style>
+@media(max-width:640px){
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;}
+}
+</style>
 {% endblock %}

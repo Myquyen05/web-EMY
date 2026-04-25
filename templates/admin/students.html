@@ -1,81 +1,107 @@
 {% extends 'admin/base_admin.html' %}
-{% block title %}Quản lý học sinh{% endblock %}
-{% block page_title %}👥 Quản lý học sinh{% endblock %}
+{% block title %}Học sinh{% endblock %}
+{% block page_title %}👥 Học sinh{% endblock %}
 
 {% block content %}
 <div class="page-header">
   <div>
     <h2>Danh sách học sinh</h2>
-    <div class="breadcrumb">Tổng: {{ students|length }} học sinh</div>
+    <div class="breadcrumb">Tổng: {{ students|length }} học sinh đang quản lý</div>
   </div>
   <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary">➕ Thêm học sinh</a>
 </div>
 
 <!-- SEARCH -->
 <form method="GET" class="search-bar">
-  <input class="search-input" type="text" name="q" value="{{ search }}" placeholder="🔍 Tìm theo tên học sinh...">
+  <input class="search-input" type="text" name="q" value="{{ search }}" placeholder="🔍 Tìm tên học sinh...">
   <button type="submit" class="btn btn-primary">Tìm</button>
-  {% if search %}<a href="{{ url_for('admin.students') }}" class="btn btn-secondary">✕ Xóa</a>{% endif %}
+  {% if search %}<a href="{{ url_for('admin.students') }}" class="btn btn-secondary">✕</a>{% endif %}
 </form>
 
-<div class="card">
-  <div class="card-body">
-    {% if students %}
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Học sinh</th>
-            <th>Chẩn đoán</th>
-            <th>Phụ huynh</th>
-            <th>Giáo viên phụ trách</th>
-            <th>Trạng thái</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for s in students %}
-          <tr>
-            <td style="color:#8a9ab0">{{ loop.index }}</td>
-            <td>
-              <strong>{{ s.fullname }}</strong><br>
-              <small style="color:#8a9ab0">
-                {% if s.dob %}{{ s.dob.strftime('%d/%m/%Y') }}{% else %}Chưa có ngày sinh{% endif %}
-                · {{ 'Nam' if s.gender == 'male' else 'Nữ' if s.gender == 'female' else '—' }}
-              </small>
-            </td>
-            <td>{{ s.diagnosis or '—' }}</td>
-            <td>
-              {{ s.parent_name or '—' }}<br>
-              <small style="color:#8a9ab0">{{ s.parent_phone or '' }}</small>
-            </td>
-            <td>{{ s.teacher.fullname if s.teacher else '—' }}</td>
-            <td><span class="badge badge-{{ s.status }}">{{ 'Đang học' if s.status == 'active' else 'Nghỉ' }}</span></td>
-            <td>
-              <div style="display:flex; gap:6px">
-                <a href="{{ url_for('admin.student_progress', student_id=s.id) }}" class="btn btn-secondary btn-sm">📈</a>
-                <a href="{{ url_for('admin.edit_student', id=s.id) }}" class="btn btn-primary btn-sm">✏️</a>
-                {% if current_user.role == 'admin' %}
-                <form method="POST" action="{{ url_for('admin.delete_student', id=s.id) }}"
-                      onsubmit="return confirm('Xóa học sinh {{ s.fullname }}?')">
-                  <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
-                </form>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">👶</div>
-      <p>{% if search %}Không tìm thấy học sinh nào.{% else %}Chưa có học sinh nào. Hãy thêm mới!{% endif %}</p>
-      <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary" style="margin-top:12px">➕ Thêm học sinh</a>
-    </div>
-    {% endif %}
+{% if students %}
+
+<!-- TABLE — hiện trên desktop -->
+<div class="card desktop-table">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Học sinh</th><th>Chẩn đoán</th><th>Phụ huynh</th><th>Giáo viên</th><th>Trạng thái</th><th>Thao tác</th></tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td style="color:var(--muted)">{{ loop.index }}</td>
+          <td>
+            <strong>{{ s.fullname }}</strong><br>
+            <small style="color:var(--muted)">
+              {% if s.dob %}{{ s.dob.strftime('%d/%m/%Y') }}{% endif %}
+              · {{ 'Nam' if s.gender=='male' else 'Nữ' if s.gender=='female' else '—' }}
+            </small>
+          </td>
+          <td><small>{{ s.diagnosis or '—' }}</small></td>
+          <td>{{ s.parent_name or '—' }}<br><small style="color:var(--muted)">{{ s.parent_phone or '' }}</small></td>
+          <td><small>{{ s.teacher.fullname if s.teacher else '—' }}</small></td>
+          <td><span class="badge badge-{{ s.status }}">{{ 'Đang học' if s.status=='active' else 'Nghỉ' }}</span></td>
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <a href="{{ url_for('admin.student_progress', student_id=s.id) }}" class="btn btn-secondary btn-xs">📈</a>
+              <a href="{{ url_for('admin.edit_student', id=s.id) }}" class="btn btn-primary btn-xs">✏️</a>
+              {% if current_user.role == 'admin' %}
+              <form method="POST" action="{{ url_for('admin.delete_student', id=s.id) }}"
+                    onsubmit="return confirm('Xóa {{ s.fullname }}?')" style="display:inline">
+                <button type="submit" class="btn btn-danger btn-xs">🗑️</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
+
+<!-- CARD VIEW — hiện trên mobile -->
+<div class="mobile-cards">
+  {% for s in students %}
+  <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div style="font-weight:800;font-size:.95rem">{{ s.fullname }}</div>
+        <div style="font-size:.76rem;color:var(--muted);margin-top:2px">
+          {{ s.diagnosis or 'Chưa có chẩn đoán' }}
+        </div>
+      </div>
+      <span class="badge badge-{{ s.status }}">{{ 'Đang học' if s.status=='active' else 'Nghỉ' }}</span>
+    </div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px;line-height:1.7">
+      👨‍👩‍👧 {{ s.parent_name or '—' }} · {{ s.parent_phone or '—' }}<br>
+      👩‍🏫 {{ s.teacher.fullname if s.teacher else 'Chưa phân công' }}
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="{{ url_for('admin.student_progress', student_id=s.id) }}" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center">📈 Tiến trình</a>
+      <a href="{{ url_for('admin.edit_student', id=s.id) }}" class="btn btn-primary btn-sm" style="flex:1;justify-content:center">✏️ Sửa</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">👶</div>
+    <p>{% if search %}Không tìm thấy học sinh "{{ search }}".{% else %}Chưa có học sinh. Hãy thêm mới!{% endif %}</p>
+    <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary" style="margin-top:14px">➕ Thêm học sinh</a>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.desktop-table { display:block; }
+.mobile-cards  { display:none; }
+@media(max-width:768px) {
+  .desktop-table { display:none; }
+  .mobile-cards  { display:block; }
+}
+</style>
 {% endblock %}

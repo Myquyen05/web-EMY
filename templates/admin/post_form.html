@@ -2,7 +2,8 @@
 {% block title %}{{ 'Sửa' if post else 'Viết' }} bài viết{% endblock %}
 {% block page_title %}{{ '✏️ Sửa bài' if post else '✍️ Viết bài mới' }}{% endblock %}
 
-{% block head %}
+{# ⚠️ ĐỔI 'head' → 'extra_css' để không ghi đè CSS của base_admin.html #}
+{% block extra_css %}
 <style>
 .upload-zone {
   border:2px dashed #d0dce8; border-radius:14px;
@@ -19,8 +20,8 @@
   border-radius:14px; overflow:hidden; margin-top:12px;
   background:#f0f4f8; position:relative;
 }
-.media-preview img { width:100%; max-height:320px; object-fit:cover; display:block; }
-.media-preview video { width:100%; max-height:320px; display:block; }
+.media-preview img    { width:100%; max-height:320px; object-fit:cover; display:block; }
+.media-preview video  { width:100%; max-height:320px; display:block; }
 .media-preview iframe { width:100%; height:320px; border:none; display:block; }
 .preview-remove {
   position:absolute; top:10px; right:10px;
@@ -30,7 +31,7 @@
 }
 .preview-remove:hover { background:rgba(220,50,50,.9); }
 
-.tab-btns { display:flex; gap:8px; margin-bottom:16px; }
+.tab-btns { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
 .tab-btn {
   padding:8px 18px; border-radius:8px; font-size:.83rem; font-weight:700;
   border:2px solid #e0e8f0; background:#fff; cursor:pointer;
@@ -60,6 +61,14 @@
   font-family:'Nunito',sans-serif;
   font-size:.9rem; line-height:1.7;
 }
+
+/* Layout 2 cột — tự stack trên mobile */
+.post-layout {
+  display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start;
+}
+@media(max-width:1024px){
+  .post-layout { grid-template-columns:1fr; }
+}
 </style>
 {% endblock %}
 
@@ -73,30 +82,32 @@
 </div>
 
 <form method="POST" enctype="multipart/form-data" id="postForm">
-<div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start">
+<div class="post-layout">
 
   <!-- LEFT: NỘI DUNG -->
   <div style="display:flex;flex-direction:column;gap:20px">
 
-    <!-- Tiêu đề -->
+    <!-- Nội dung bài viết -->
     <div class="card">
       <div class="card-header"><h3>📝 Nội dung bài viết</h3></div>
       <div class="card-body" style="padding:24px">
         <div class="form-group">
           <label>Tiêu đề bài viết *</label>
           <input class="form-control" type="text" name="title" id="titleInput"
-                 value="{{ post.title if post else '' }}" required
+                 value="{{ post.title if post else '' }}" required maxlength="100"
                  placeholder="VD: 5 dấu hiệu nhận biết tự kỷ sớm ở trẻ dưới 3 tuổi"
-                 oninput="updateCharCount(this,'titleCount',100)">
+                 oninput="updateCharCount(this,'titleCount')">
           <div class="char-count"><span id="titleCount">{{ post.title|length if post else 0 }}</span>/100</div>
         </div>
+
         <div class="form-group">
           <label>Tóm tắt (hiển thị ngoài trang blog)</label>
-          <textarea class="form-control" name="summary" rows="3"
+          <textarea class="form-control" name="summary" rows="3" maxlength="200"
                     placeholder="Mô tả ngắn hấp dẫn để phụ huynh muốn đọc tiếp..."
-                    oninput="updateCharCount(this,'sumCount',200)">{{ post.summary if post else '' }}</textarea>
+                    oninput="updateCharCount(this,'sumCount')">{{ post.summary if post and post.summary else '' }}</textarea>
           <div class="char-count"><span id="sumCount">{{ post.summary|length if post and post.summary else 0 }}</span>/200</div>
         </div>
+
         <div class="form-group">
           <label>Nội dung bài viết *</label>
           <div class="editor-toolbar">
@@ -111,9 +122,8 @@
             <button type="button" onclick="insertLink()">🔗</button>
             <button type="button" onclick="fmt('removeFormat')">✕ Format</button>
           </div>
-          <div id="editor" class="form-control content-area"
-               contenteditable="true"
-               style="min-height:280px;padding:14px 16px;border-radius:0 0 10px 10px;border-top:none">{{ post.content|safe if post else '' }}</div>
+          <div id="editor" class="form-control content-area" contenteditable="true"
+               style="padding:14px 16px">{{ post.content|safe if post and post.content else '' }}</div>
           <input type="hidden" name="content" id="contentHidden">
         </div>
       </div>
@@ -124,9 +134,11 @@
       <div class="card-header"><h3>🖼️ Ảnh / Video đại diện</h3></div>
       <div class="card-body" style="padding:24px">
         <div class="tab-btns">
-          <button type="button" class="tab-btn active" onclick="switchTab('upload')">📁 Upload file</button>
-          <button type="button" class="tab-btn" onclick="switchTab('url')">🔗 Dán URL / YouTube</button>
-          {% if post and post.thumbnail %}<button type="button" class="tab-btn" onclick="switchTab('current')">👁️ Media hiện tại</button>{% endif %}
+          <button type="button" class="tab-btn active" onclick="switchTab(event,'upload')">📁 Upload file</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event,'url')">🔗 Dán URL / YouTube</button>
+          {% if post and post.thumbnail %}
+          <button type="button" class="tab-btn" onclick="switchTab(event,'current')">👁️ Media hiện tại</button>
+          {% endif %}
         </div>
 
         <!-- Tab Upload -->
@@ -138,7 +150,7 @@
             <p>Hỗ trợ: JPG, PNG, GIF, WebP, MP4, WebM (tối đa 50MB)</p>
           </div>
           <div id="uploadPreview" style="display:none" class="media-preview">
-            <img id="previewImg" src="" alt="" style="display:none">
+            <img   id="previewImg" src="" alt="" style="display:none">
             <video id="previewVid" controls style="display:none"></video>
             <button type="button" class="preview-remove" onclick="clearUpload()" title="Xóa">✕</button>
           </div>
@@ -154,7 +166,7 @@
                    oninput="previewUrl(this.value)">
           </div>
           <div id="urlPreview" style="display:none" class="media-preview">
-            <img id="urlImg" src="" alt="" style="display:none">
+            <img    id="urlImg"   src="" alt="" style="display:none">
             <iframe id="urlFrame" src="" style="display:none" allowfullscreen></iframe>
           </div>
         </div>
@@ -163,14 +175,16 @@
         {% if post and post.thumbnail %}
         <div class="tab-panel" id="tab-current">
           <div class="media-preview">
-            {% set mtype = get_media_type(post.thumbnail) %}
-            {% if mtype == 'video' %}
-              <video controls><source src="{{ url_for('static', filename=post.thumbnail) }}"></video>
-            {% elif mtype == 'youtube' %}
-              {% set yt_id = post.thumbnail.split('v=')[-1].split('&')[0] if 'v=' in post.thumbnail else post.thumbnail.split('/')[-1] %}
+            {% set thumb = post.thumbnail %}
+            {% if thumb.endswith('.mp4') or thumb.endswith('.webm') or thumb.endswith('.mov') %}
+              <video controls>
+                <source src="{{ url_for('static', filename=thumb) if thumb.startswith('uploads/') else thumb }}">
+              </video>
+            {% elif 'youtube.com' in thumb or 'youtu.be' in thumb %}
+              {% set yt_id = thumb.split('v=')[-1].split('&')[0] if 'v=' in thumb else thumb.split('/')[-1].split('?')[0] %}
               <iframe src="https://www.youtube.com/embed/{{ yt_id }}" allowfullscreen></iframe>
             {% else %}
-              <img src="{{ url_for('static', filename=post.thumbnail) if post.thumbnail.startswith('uploads/') else post.thumbnail }}" alt="">
+              <img src="{{ url_for('static', filename=thumb) if thumb.startswith('uploads/') else thumb }}" alt="">
             {% endif %}
           </div>
           <div style="margin-top:12px">
@@ -192,20 +206,22 @@
         <div class="form-group">
           <label>Danh mục</label>
           <select class="form-control" name="category">
-            <option value="news"  {{ 'selected' if post and post.category=='news' }}>📰 Tin tức</option>
-            <option value="tips"  {{ 'selected' if post and post.category=='tips' }}>💡 Kiến thức & Tips</option>
-            <option value="event" {{ 'selected' if post and post.category=='event' }}>📅 Sự kiện</option>
+            <option value="news"  {{ 'selected' if post and post.category=='news'  else '' }}>📰 Tin tức</option>
+            <option value="tips"  {{ 'selected' if post and post.category=='tips'  else '' }}>💡 Kiến thức & Tips</option>
+            <option value="event" {{ 'selected' if post and post.category=='event' else '' }}>📅 Sự kiện</option>
           </select>
         </div>
+
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-            <input type="checkbox" name="is_published" style="width:18px;height:18px"
-                   {{ 'checked' if post and post.is_published }}>
+            <input type="checkbox" name="is_published" value="1" style="width:18px;height:18px"
+                   {{ 'checked' if (post and post.is_published) or not post else '' }}>
             <span>✅ Xuất bản ngay (hiển thị cho phụ huynh)</span>
           </label>
         </div>
+
         {% if post %}
-        <div style="padding:12px;background:#f8fafc;border-radius:10px;font-size:.78rem;color:#637282">
+        <div style="padding:12px;background:#f8fafc;border-radius:10px;font-size:.78rem;color:#637282;line-height:1.8">
           <strong>Ngày tạo:</strong> {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}<br>
           <strong>Lượt xem:</strong> 👁️ {{ post.views }}<br>
           <strong>Tác giả:</strong> {{ post.author.fullname if post.author else '—' }}
@@ -222,14 +238,14 @@
           <div id="cardPreviewImg" style="height:120px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:2.5rem">📰</div>
           <div style="padding:12px">
             <div style="font-size:.65rem;font-weight:800;color:var(--sky);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" id="cardPreviewCat">Tin tức</div>
-            <div style="font-size:.88rem;font-weight:700;line-height:1.3;margin-bottom:6px" id="cardPreviewTitle">Tiêu đề bài viết...</div>
-            <div style="font-size:.75rem;color:#637282;line-height:1.5" id="cardPreviewSum">Tóm tắt bài viết sẽ hiển thị ở đây...</div>
+            <div style="font-size:.88rem;font-weight:700;line-height:1.3;margin-bottom:6px" id="cardPreviewTitle">{{ post.title if post else 'Tiêu đề bài viết...' }}</div>
+            <div style="font-size:.75rem;color:#637282;line-height:1.5"  id="cardPreviewSum">{{ post.summary if post and post.summary else 'Tóm tắt bài viết sẽ hiển thị ở đây...' }}</div>
           </div>
         </div>
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem" onclick="submitForm()">
+    <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem;justify-content:center">
       {{ '💾 Cập nhật bài viết' if post else '🚀 Đăng bài viết' }}
     </button>
     <a href="{{ url_for('admin.posts') }}" class="btn btn-secondary" style="width:100%;justify-content:center">Hủy</a>
@@ -242,18 +258,23 @@
 {% block scripts %}
 <script>
 // ── Tab switch ──
-function switchTab(name) {
+function switchTab(ev, name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const panel = document.getElementById('tab-'+name);
   if(panel) panel.classList.add('active');
-  event.target.classList.add('active');
+  if(ev && ev.currentTarget) ev.currentTarget.classList.add('active');
 }
 
 // ── Preview file upload ──
 function previewFile(input) {
   const file = input.files[0];
   if(!file) return;
+  if(file.size > 50 * 1024 * 1024){
+    alert('File quá lớn! Tối đa 50MB.');
+    input.value = '';
+    return;
+  }
   const prev = document.getElementById('uploadPreview');
   const img  = document.getElementById('previewImg');
   const vid  = document.getElementById('previewVid');
@@ -269,10 +290,10 @@ function previewFile(input) {
     vid.style.display = 'none';
     img.style.display = 'block';
     img.src = url;
-    document.getElementById('cardPreviewImg').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+    document.getElementById('cardPreviewImg').innerHTML =
+      `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
   }
 }
-
 function clearUpload() {
   document.getElementById('mediaFile').value = '';
   document.getElementById('uploadPreview').style.display = 'none';
@@ -282,23 +303,24 @@ function clearUpload() {
 
 // ── Preview URL ──
 function previewUrl(val) {
-  val = val.trim();
-  if(!val) return;
+  val = (val || '').trim();
   const prev  = document.getElementById('urlPreview');
   const img   = document.getElementById('urlImg');
   const frame = document.getElementById('urlFrame');
+  if(!val){ prev.style.display = 'none'; return; }
   prev.style.display = 'block';
 
   if(val.includes('youtube.com') || val.includes('youtu.be')) {
     let vid_id = '';
-    if(val.includes('v='))        vid_id = val.split('v=')[1].split('&')[0];
-    else if(val.includes('youtu.be')) vid_id = val.split('youtu.be/')[1];
+    if(val.includes('v='))             vid_id = val.split('v=')[1].split('&')[0];
+    else if(val.includes('youtu.be/')) vid_id = val.split('youtu.be/')[1].split('?')[0];
     img.style.display   = 'none';
     frame.style.display = 'block';
     frame.src = `https://www.youtube.com/embed/${vid_id}`;
-    document.getElementById('cardPreviewImg').innerHTML = `<img src="https://img.youtube.com/vi/${vid_id}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover">`;
+    document.getElementById('cardPreviewImg').innerHTML =
+      `<img src="https://img.youtube.com/vi/${vid_id}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover">`;
   } else if(val.includes('vimeo.com')) {
-    const vid_id = val.split('/').pop();
+    const vid_id = val.split('/').pop().split('?')[0];
     img.style.display   = 'none';
     frame.style.display = 'block';
     frame.src = `https://player.vimeo.com/video/${vid_id}`;
@@ -306,29 +328,35 @@ function previewUrl(val) {
     frame.style.display = 'none';
     img.style.display   = 'block';
     img.src = val;
-    document.getElementById('cardPreviewImg').innerHTML = `<img src="${val}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
+    document.getElementById('cardPreviewImg').innerHTML =
+      `<img src="${val}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;
   }
 }
 
 // ── Rich text editor ──
-function fmt(cmd) { document.execCommand(cmd, false, null); }
-function fmtBlock(tag) { document.execCommand('formatBlock', false, tag); }
-function insertLink() {
+function fmt(cmd)       { document.getElementById('editor').focus(); document.execCommand(cmd, false, null); }
+function fmtBlock(tag)  { document.getElementById('editor').focus(); document.execCommand('formatBlock', false, tag); }
+function insertLink()   {
   const url = prompt('Nhập URL:');
-  if(url) document.execCommand('createLink', false, url);
+  if(url){ document.getElementById('editor').focus(); document.execCommand('createLink', false, url); }
 }
 
 // ── Submit: copy editor → hidden input ──
-function submitForm() {
-  document.getElementById('contentHidden').value = document.getElementById('editor').innerHTML;
-}
-document.getElementById('postForm').addEventListener('submit', function() {
-  document.getElementById('contentHidden').value = document.getElementById('editor').innerHTML;
+document.getElementById('postForm').addEventListener('submit', function(e) {
+  const editor = document.getElementById('editor');
+  const hidden = document.getElementById('contentHidden');
+  hidden.value = editor.innerHTML.trim();
+  if(!hidden.value || hidden.value === '<br>'){
+    e.preventDefault();
+    alert('Vui lòng nhập nội dung bài viết!');
+    editor.focus();
+  }
 });
 
 // ── Char count ──
-function updateCharCount(el, countId, max) {
-  document.getElementById(countId).textContent = el.value.length;
+function updateCharCount(el, countId) {
+  const span = document.getElementById(countId);
+  if(span) span.textContent = el.value.length;
 }
 
 // ── Live preview card ──
@@ -339,26 +367,28 @@ document.querySelector('textarea[name="summary"]').addEventListener('input', fun
   document.getElementById('cardPreviewSum').textContent = this.value || 'Tóm tắt bài viết sẽ hiển thị ở đây...';
 });
 document.querySelector('select[name="category"]').addEventListener('change', function() {
-  const map = {news:'📰 Tin tức', tips:'💡 Kiến thức', event:'📅 Sự kiện'};
+  const map = { news:'📰 Tin tức', tips:'💡 Kiến thức', event:'📅 Sự kiện' };
   document.getElementById('cardPreviewCat').textContent = map[this.value] || this.value;
 });
 
 // ── Drag & drop ──
 const zone = document.getElementById('uploadZone');
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
-zone.addEventListener('drop', e => {
-  e.preventDefault(); zone.classList.remove('drag');
-  const file = e.dataTransfer.files[0];
-  if(file) {
-    const input = document.getElementById('mediaFile');
-    const dt = new DataTransfer(); dt.items.add(file);
-    input.files = dt.files;
-    previewFile(input);
-  }
-});
+if(zone){
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if(file) {
+      const input = document.getElementById('mediaFile');
+      const dt = new DataTransfer(); dt.items.add(file);
+      input.files = dt.files;
+      previewFile(input);
+    }
+  });
+}
 
-// Init existing preview từ URL
+// ── Init existing preview ──
 window.addEventListener('DOMContentLoaded', () => {
   const urlInput = document.getElementById('mediaUrl');
   if(urlInput && urlInput.value) previewUrl(urlInput.value);

@@ -1,80 +1,94 @@
 {% extends 'admin/base_admin.html' %}
-{% block title %}Danh sách đăng ký test{% endblock %}
-{% block page_title %}📝 Đăng ký test đánh giá{% endblock %}
+{% block title %}Đăng ký test{% endblock %}
+{% block page_title %}📝 Đăng ký test{% endblock %}
 
 {% block content %}
 <div class="page-header">
   <div>
-    <h2>Danh sách đăng ký</h2>
-    <div class="breadcrumb">Phụ huynh đăng ký đánh giá trẻ</div>
+    <h2>Danh sách đăng ký đánh giá</h2>
+    <div class="breadcrumb">Phụ huynh đăng ký từ trang web</div>
   </div>
 </div>
 
 <!-- FILTER TABS -->
-<div style="display:flex;gap:8px;margin-bottom:20px">
-  <a href="{{ url_for('admin.registrations') }}"
-     class="btn {{ 'btn-primary' if not status else 'btn-secondary' }}">Tất cả</a>
-  <a href="{{ url_for('admin.registrations', status='pending') }}"
-     class="btn {{ 'btn-primary' if status == 'pending' else 'btn-secondary' }}">⏳ Chờ duyệt</a>
-  <a href="{{ url_for('admin.registrations', status='confirmed') }}"
-     class="btn {{ 'btn-primary' if status == 'confirmed' else 'btn-secondary' }}">✅ Đã xác nhận</a>
-  <a href="{{ url_for('admin.registrations', status='done') }}"
-     class="btn {{ 'btn-primary' if status == 'done' else 'btn-secondary' }}">🏁 Hoàn tất</a>
+<div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+  <a href="{{ url_for('admin.registrations') }}"                    class="btn {{ 'btn-primary' if not status else 'btn-secondary' }}">Tất cả</a>
+  <a href="{{ url_for('admin.registrations', status='pending') }}"  class="btn {{ 'btn-primary' if status=='pending'   else 'btn-secondary' }}">⏳ Chờ duyệt</a>
+  <a href="{{ url_for('admin.registrations', status='confirmed') }}" class="btn {{ 'btn-primary' if status=='confirmed' else 'btn-secondary' }}">✅ Xác nhận</a>
+  <a href="{{ url_for('admin.registrations', status='done') }}"     class="btn {{ 'btn-primary' if status=='done'      else 'btn-secondary' }}">🏁 Hoàn tất</a>
 </div>
 
-<div class="card">
-  <div class="card-body">
-    {% if regs %}
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Tên bé</th><th>Phụ huynh</th>
-            <th>Vấn đề lo ngại</th><th>Ngày mong muốn</th>
-            <th>Ngày đăng ký</th><th>Trạng thái</th><th>Xử lý</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in regs %}
-          <tr>
-            <td style="color:#8a9ab0">{{ loop.index }}</td>
-            <td><strong>{{ r.child_name }}</strong><br><small style="color:#8a9ab0">{{ r.child_age }}</small></td>
-            <td>
-              <strong>{{ r.parent_name }}</strong><br>
-              <small style="color:#8a9ab0">{{ r.parent_phone }}</small><br>
-              <small style="color:#8a9ab0">{{ r.parent_email or '' }}</small>
-            </td>
-            <td style="max-width:200px;font-size:.82rem">{{ r.concern or '—' }}</td>
-            <td><small>{{ r.preferred_date or '—' }}</small></td>
-            <td><small style="color:#8a9ab0">{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</small></td>
-            <td>
-              <span class="badge badge-{{ r.status }}">
-                {{ {'pending':'Chờ duyệt','confirmed':'Xác nhận','done':'Hoàn tất'}[r.status] }}
-              </span>
-            </td>
-            <td>
-              <!-- Mini form đổi trạng thái -->
-              <form method="POST" action="{{ url_for('admin.update_registration', id=r.id) }}"
-                    style="display:flex;gap:6px;align-items:center">
-                <select name="status" class="form-control" style="padding:5px 8px;font-size:.78rem;width:auto">
-                  <option value="pending"   {{ 'selected' if r.status=='pending' }}>Chờ duyệt</option>
-                  <option value="confirmed" {{ 'selected' if r.status=='confirmed' }}>Xác nhận</option>
-                  <option value="done"      {{ 'selected' if r.status=='done' }}>Hoàn tất</option>
-                </select>
-                <button type="submit" class="btn btn-success btn-sm">✓</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">📭</div>
-      <p>Chưa có đăng ký nào.</p>
-    </div>
-    {% endif %}
+{% if regs %}
+
+<!-- TABLE — desktop -->
+<div class="card desktop-table">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Tên bé</th><th>Phụ huynh</th><th>Vấn đề</th><th>Ngày mong muốn</th><th>Ngày đăng ký</th><th>Trạng thái</th><th>Cập nhật</th></tr>
+      </thead>
+      <tbody>
+        {% for r in regs %}
+        <tr>
+          <td><strong>{{ r.child_name }}</strong><br><small style="color:var(--muted)">{{ r.child_age }}</small></td>
+          <td><strong>{{ r.parent_name }}</strong><br><small style="color:var(--muted)">{{ r.parent_phone }}</small></td>
+          <td style="max-width:180px"><small>{{ r.concern|truncate(60) if r.concern else '—' }}</small></td>
+          <td><small>{{ r.preferred_date or '—' }}</small></td>
+          <td><small style="color:var(--muted)">{{ r.created_at.strftime('%d/%m/%Y') }}</small></td>
+          <td><span class="badge badge-{{ r.status }}">{{ {'pending':'Chờ duyệt','confirmed':'Xác nhận','done':'Hoàn tất'}[r.status] }}</span></td>
+          <td>
+            <form method="POST" action="{{ url_for('admin.update_registration', id=r.id) }}" style="display:flex;gap:6px;align-items:center">
+              <select name="status" class="form-control" style="padding:5px 8px;font-size:.76rem;width:auto;height:auto">
+                <option value="pending"   {{ 'selected' if r.status=='pending' }}>Chờ</option>
+                <option value="confirmed" {{ 'selected' if r.status=='confirmed' }}>Xác nhận</option>
+                <option value="done"      {{ 'selected' if r.status=='done' }}>Xong</option>
+              </select>
+              <button type="submit" class="btn btn-success btn-xs">✓</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
+
+<!-- CARD VIEW — mobile -->
+<div class="mobile-cards">
+  {% for r in regs %}
+  <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div>
+        <div style="font-weight:800;font-size:.95rem">{{ r.child_name }} <small style="color:var(--muted);font-weight:400">— {{ r.child_age }}</small></div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:2px">{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+      </div>
+      <span class="badge badge-{{ r.status }}">{{ {'pending':'Chờ duyệt','confirmed':'Xác nhận','done':'Hoàn tất'}[r.status] }}</span>
+    </div>
+    <div style="font-size:.82rem;line-height:1.75;margin-bottom:12px">
+      👨‍👩‍👧 <strong>{{ r.parent_name }}</strong> · {{ r.parent_phone }}<br>
+      {% if r.concern %}<span style="color:var(--muted)">💬 {{ r.concern|truncate(80) }}</span><br>{% endif %}
+      {% if r.preferred_date %}📅 Mong muốn: {{ r.preferred_date }}{% endif %}
+    </div>
+    <form method="POST" action="{{ url_for('admin.update_registration', id=r.id) }}" style="display:flex;gap:8px;align-items:center">
+      <select name="status" class="form-control" style="flex:1;padding:9px 12px;font-size:.85rem">
+        <option value="pending"   {{ 'selected' if r.status=='pending' }}>⏳ Chờ duyệt</option>
+        <option value="confirmed" {{ 'selected' if r.status=='confirmed' }}>✅ Xác nhận</option>
+        <option value="done"      {{ 'selected' if r.status=='done' }}>🏁 Hoàn tất</option>
+      </select>
+      <button type="submit" class="btn btn-success">Lưu</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="card">
+  <div class="empty-state"><div class="empty-icon">📭</div><p>Chưa có đăng ký nào.</p></div>
+</div>
+{% endif %}
+
+<style>
+.desktop-table{display:block}.mobile-cards{display:none}
+@media(max-width:768px){.desktop-table{display:none}.mobile-cards{display:block}}
+</style>
 {% endblock %}

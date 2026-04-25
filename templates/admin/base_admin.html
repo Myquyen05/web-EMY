@@ -152,6 +152,7 @@ tr:hover td { background:#fafcff; }
 .btn-secondary { background:#f0f4f8; color:var(--deep); }
 .btn-secondary:hover { background:#e2e8f0; }
 .btn-sm { padding:5px 12px; font-size:.78rem; }
+.btn-xs { padding:5px 10px; font-size:.74rem; border-radius:6px; }
 
 /* ── FORM ── */
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -174,6 +175,8 @@ textarea.form-control { resize:vertical; min-height:100px; }
 }
 .page-header h2 { font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; }
 .breadcrumb { font-size:.8rem; color:#8a9ab0; margin-top:2px; }
+.breadcrumb a { color:var(--sky); text-decoration:none; }
+.breadcrumb a:hover { text-decoration:underline; }
 
 /* ── SEARCH BAR ── */
 .search-bar {
@@ -202,6 +205,9 @@ textarea.form-control { resize:vertical; min-height:100px; }
   .page-body{padding:20px 16px;}
 }
 </style>
+
+{# ====== Block cho CSS riêng của từng trang con ====== #}
+{% block extra_css %}{% endblock %}
 {% endblock %}
 
 {% block body %}
@@ -222,29 +228,29 @@ textarea.form-control { resize:vertical; min-height:100px; }
     <nav class="sidebar-nav">
       <div class="nav-section">Tổng quan</div>
       <a href="{{ url_for('admin.dashboard') }}"
-         class="nav-link {{ 'active' if request.endpoint == 'admin.dashboard' }}">
+         class="nav-link {{ 'active' if request.endpoint == 'admin.dashboard' else '' }}">
         <span class="icon">📊</span> Dashboard
       </a>
 
       <div class="nav-section">Học sinh</div>
       <a href="{{ url_for('admin.students') }}"
-         class="nav-link {{ 'active' if 'student' in request.endpoint }}">
+         class="nav-link {{ 'active' if request.endpoint and 'student' in request.endpoint else '' }}">
         <span class="icon">👥</span> Danh sách học sinh
       </a>
       <a href="{{ url_for('admin.progress') }}"
-         class="nav-link {{ 'active' if 'progress' in request.endpoint }}">
+         class="nav-link {{ 'active' if request.endpoint and 'progress' in request.endpoint else '' }}">
         <span class="icon">📈</span> Tiến trình
       </a>
 
       <div class="nav-section">Nội dung</div>
       <a href="{{ url_for('admin.posts') }}"
-         class="nav-link {{ 'active' if 'post' in request.endpoint }}">
+         class="nav-link {{ 'active' if request.endpoint and 'post' in request.endpoint else '' }}">
         <span class="icon">📰</span> Bài viết
       </a>
 
       <div class="nav-section">Đăng ký</div>
       <a href="{{ url_for('admin.registrations') }}"
-         class="nav-link {{ 'active' if 'registration' in request.endpoint }}">
+         class="nav-link {{ 'active' if request.endpoint and 'registration' in request.endpoint else '' }}">
         <span class="icon">📝</span> Đăng ký test
         {% if pending_count is defined and pending_count > 0 %}
           <span class="badge">{{ pending_count }}</span>
@@ -254,7 +260,7 @@ textarea.form-control { resize:vertical; min-height:100px; }
       {% if current_user.role == 'admin' %}
       <div class="nav-section">Hệ thống</div>
       <a href="{{ url_for('admin.accounts') }}"
-         class="nav-link {{ 'active' if 'account' in request.endpoint }}">
+         class="nav-link {{ 'active' if request.endpoint and 'account' in request.endpoint else '' }}">
         <span class="icon">🔐</span> Tài khoản
       </a>
       {% endif %}
@@ -284,8 +290,8 @@ textarea.form-control { resize:vertical; min-height:100px; }
   </div>
 
 </div>
+
 <script>
-  // Đồng hồ
   function tick(){
     const now = new Date();
     document.getElementById('clock').textContent =
@@ -294,5 +300,7 @@ textarea.form-control { resize:vertical; min-height:100px; }
   }
   tick(); setInterval(tick,1000);
 </script>
+
+{# ====== Block cho JS riêng của từng trang con ====== #}
 {% block scripts %}{% endblock %}
 {% endblock %}
